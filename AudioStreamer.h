@@ -51,6 +51,8 @@
 // will occur if this number is too small.
 
 #define kAQMaxPacketDescs 6	// Number of packet descriptions in our array (formerly 512)
+
+#define networkTimeOutTime 5
 bool interruptedOnPlayback;
 
 typedef enum
@@ -190,8 +192,9 @@ extern NSString * const ASStatusChangedNotification;
         VirtualRingBuffer *ringBuffer;   //reference to a ring buffer
         UInt32 allBytesAvailable;
     
-        Game * _game;    
-        Player *_localPlayerObj;    
+        Game * _game;
+        Player *_localPlayerObj;
+        NSTimer * ringBufferReaderTimer;
     
 }
 

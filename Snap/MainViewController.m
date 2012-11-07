@@ -377,6 +377,7 @@
 
 - (void)gameViewController:(GameViewController *)controller didQuitWithReason:(QuitReason)reason
 {
+    NSLog(@"mainviewcontroller:didQuitWithReason    ");
 	[self dismissViewControllerAnimated:NO completion:^
      {
          if (reason == QuitReasonConnectionDropped)

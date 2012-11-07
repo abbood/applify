@@ -34,10 +34,25 @@
 typedef enum
 {
     BroadCastStateInProgress,
-    BroadCastStatePaused
+    BroadCastStatePaused,
+    BroadCastStateStopped
     
 }
 BroadCastState;
+
+typedef enum
+{
+	GameStateWaitingForSignIn,
+	GameStateWaitingForReady,
+    GameStateWaitingForPrimed,
+    GameStateBroadCastInProgress,
+    GameStateBroadCastPaused,
+    GameStatePlayBackCommenced,
+    GameStateDealing,
+	GameStateQuitting
+}
+GameState;
+
 
 
 
@@ -73,18 +88,23 @@ BroadCastState;
     NSThread *fileReaderThread;
     NSURL * fileObj;
     
-    VirtualRingBuffer *ringBuffer;
     UInt32 ringBufferCapacity;
     UInt32 bytesAvailableToWrite;
     UInt32 ringBufferBatchNumber;
     
     UInt32 totalBytesReceived;
     UInt32 itemBeginningOffset;
-    Boolean hasStartedReading;
     
     NSMutableArray *serverPacketProfiler;
     NSMutableArray *clientPacketProfiler;            
-    UInt8 numProfilePackets; 
+    UInt8 numProfilePackets;
+
+    
+    @public
+        VirtualRingBuffer *ringBuffer;
+        Boolean hasStartedReading;
+        double lastAudioPacketTimeStamp;
+    	GameState _state;
 }
 
 @property (nonatomic, weak) id <GameDelegate> delegate;

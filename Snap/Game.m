@@ -23,25 +23,11 @@
 #import "ServerProfiler.h"
 #import "ClientProfiler.h"
 
-typedef enum
-{
-	GameStateWaitingForSignIn,
-	GameStateWaitingForReady,
-    GameStateWaitingForPrimed,
-    GameStateBroadCastInProgress,
-    GameStateBroadCastPaused,
-    GameStatePlayBackCommenced,
-    GameStateDealing,
-	GameStateQuitting
-}
-GameState;
-
-
 
 
 @implementation Game
 {
-	GameState _state;
+
 
     
 	GKSession *_session;
@@ -175,7 +161,27 @@ GameState;
 
 - (void)quitGameWithReason:(QuitReason)reason
 {
+	[NSObject cancelPreviousPerformRequestsWithTarget:self];
+    
 	_state = GameStateQuitting;
+    
+	if (reason == QuitReasonUserQuit)
+	{
+		if (self.isServer)
+		{
+            NSLog(@"server about to send quit packet");
+			Packet *packet = [Packet packetWithType:PacketTypeServerQuit];
+//            packet.sendReliably = NO;
+			[self sendPacketToAllClients:packet];
+            [hostViewController.musicPlayer stop];
+            _broadCastState = BroadCastStateStopped;
+		}
+		else
+		{
+			Packet *packet = [Packet packetWithType:PacketTypeClientQuit];
+			[self sendPacketToServer:packet];
+		}
+	}
     
 	[_session disconnectFromAllPeers];
 	_session.delegate = nil;
@@ -248,7 +254,10 @@ GameState;
 		break;
                                     
         case PacketTypeAudioBuffer:
-        {   
+        {
+
+            lastAudioPacketTimeStamp = [Timer getCurTime];;
+
             UInt32 PackNumber = ((PacketAudioBuffer *)recievedPacket).packetNumber;
             if (numProfilePackets < kNumAQBufs) {
                 Packet *packet = [PacketRecieved packetWithNumber:PackNumber];
@@ -262,7 +271,7 @@ GameState;
             [self appendToRingBuffer: packet];
             
         }
-        break;   
+        break;
             
         case PacketTypePlayMusicNow:
         {                                 
@@ -271,9 +280,15 @@ GameState;
             streamer->state = AS_READY_TO_PLAY;
             
             pthread_cond_signal(&streamer->queueBufferReadyCondition);
-            pthread_mutex_unlock(&streamer->queueBuffersMutex);  
+            pthread_mutex_unlock(&streamer->queueBuffersMutex);
+        }
+        break;
             
-            
+        case PacketTypeServerQuit:
+        {
+            NSLog(@"CLIENT received packet server quit");
+            streamer->state = AS_STOPPED;
+
         }
         break;
             
@@ -284,6 +299,8 @@ GameState;
 	}
         
 }
+
+
 
 -(void)startClientPlayBack
 {
@@ -491,35 +508,7 @@ void CalculateBytesForTime(AudioStreamBasicDescription inDesc, Float64 inSeconds
 	
 			}
         }
-        break;
-            
-        case PacketTypeReceived:
-        {
-            
-            if (![_localPlayerObj.packetProfiler.clientProfilers objectForKey:player.peerID]) {
-                [_localPlayerObj.packetProfiler.clientProfilers setObject:[NSMutableArray arrayWithCapacity:kNumAQBufs]
-                                                                   forKey:player.peerID];                
-            }
-            
-            NSMutableArray *clientProfiler = [_localPlayerObj.packetProfiler.clientProfilers 
-                                                        objectForKey:player.peerID];
-            
-            
-            UInt32 packetNum = ((PacketRecieved *)packet).packetNumber;
-            NSLog(@"this is packet num received %lu",packetNum);
-            
-          /*  id roundTrip = [NSNumber numberWithDouble:[self getRoundTripTime:[[_localPlayerObj.packetProfiler.packetSentSchedule 
-                                                        objectAtIndex:packetNum] doubleValue]]];*/
-            double roundTriptime = [Timer getCurTime];
-            NSLog(@"this is the round trip time[%lu] %f",packetNum, roundTriptime);
-            id roundTrip = [NSNumber numberWithDouble:roundTriptime];
-            
-            [clientProfiler insertObject:roundTrip atIndex:packetNum];
-            
-            _state = GameStateWaitingForPrimed;
-            
-        }
-        break;
+        break;            
             
         case PacketTypeClientPrimed:
         {
@@ -814,7 +803,7 @@ void CalculateBytesForTime(AudioStreamBasicDescription inDesc, Float64 inSeconds
 	{
 		 NSLog(@"Error sending data to clients: %@", error);
 	}
-    NSLog(@"done sendint packet to all clients");
+
     
 }
 
@@ -983,10 +972,22 @@ static void CheckError (OSStatus error, const char *operation)
                          beforeDate:[NSDate distantFuture]];
             
             NSLog(@"SERVER: after broadcast run loop");            
-        } while (isRunning); 
+        } while (isRunning && [self shouldContinueBroadcasting]);
     }   
     
+    
     NSLog(@"about to exit server broad cast loop");
+}
+
+-(BOOL)shouldContinueBroadcasting
+{
+    if (_broadCastState == BroadCastStateInProgress) {
+        NSLog(@"shouldContinueBroadcasting? YES");
+        return YES;
+    }
+    
+            NSLog(@"shouldContinueBroadcasting? NO");
+    return NO;
 }
 
 -(void)setUpReader
@@ -1086,7 +1087,8 @@ static void CheckError (OSStatus error, const char *operation)
         if ((packetSpaceRemaining < (dataSize + AUDIO_STREAM_PACK_DESC_SIZE)) || 
             (packetDescrSpaceRemaining < AUDIO_STREAM_PACK_DESC_SIZE))
         {
-            [self encapsulateAndShipPacket:packet packetDescriptions:packetDescriptions packetID:assetOnAirID];            
+            if (![self encapsulateAndShipPacket:packet packetDescriptions:packetDescriptions packetID:assetOnAirID])
+                break;
         }
         
         memcpy((char*)packet + packetBytesFilled, 
@@ -1105,7 +1107,8 @@ static void CheckError (OSStatus error, const char *operation)
         // if this is the last packet, then ship it
         if (i == (inNumberPackets - 1)) {          
             //NSLog(@"woooah! this is the last packet (%d).. so we will ship it!", i);
-            [self encapsulateAndShipPacket:packet packetDescriptions:packetDescriptions packetID:assetOnAirID];         
+            if (![self encapsulateAndShipPacket:packet packetDescriptions:packetDescriptions packetID:assetOnAirID])
+                break;
             
         }                  
     }      
@@ -1135,10 +1138,15 @@ static void CheckError (OSStatus error, const char *operation)
     return packetDescription;
 }
 
-- (void)encapsulateAndShipPacket:(void *)source 
+- (BOOL)encapsulateAndShipPacket:(void *)source
               packetDescriptions:(void *)packetDescriptions
                         packetID:(NSString *)packetID
 {
+    if (![self shouldContinueBroadcasting])
+    {
+        [sampleBroadcastTimer invalidate];
+        return NO;
+    }
     // package Packet
     char * headerPacket = (char *)malloc(MAX_PACKET_SIZE + AUDIO_BUFFER_PACKET_HEADER_SIZE + packetDescriptionsBytesFilled);
     
@@ -1191,6 +1199,7 @@ static void CheckError (OSStatus error, const char *operation)
     packetNumber++;
     free(headerPacket);    
     //  free(packet); free(packetDescriptions);
+    return YES;
     
 }
 

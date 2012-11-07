@@ -4,42 +4,29 @@
    version = "1.0">
    <FileBreakpoints>
       <FileBreakpoint
-         shouldBeEnabled = "Yes"
+         shouldBeEnabled = "No"
          ignoreCount = "0"
          continueAfterRunningActions = "No"
-         filePath = "Snap/Game.m"
-         timestampString = "371797684.660637"
+         filePath = "AudioStreamer.m"
+         timestampString = "373985214.118788"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "1243"
-         endingLineNumber = "1243"
-         landmarkName = "-setUpStreamer:"
+         startingLineNumber = "435"
+         endingLineNumber = "435"
+         landmarkName = "-runLoopShouldExit"
          landmarkType = "5">
       </FileBreakpoint>
       <FileBreakpoint
          shouldBeEnabled = "Yes"
          ignoreCount = "0"
          continueAfterRunningActions = "No"
-         filePath = "Snap/HostViewController.m"
-         timestampString = "373963885.262111"
+         filePath = "AudioStreamer.m"
+         timestampString = "373988952.022117"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "126"
-         endingLineNumber = "126"
-         landmarkName = "-exitAction:"
-         landmarkType = "5">
-      </FileBreakpoint>
-      <FileBreakpoint
-         shouldBeEnabled = "Yes"
-         ignoreCount = "0"
-         continueAfterRunningActions = "No"
-         filePath = "Snap/GameViewController.m"
-         timestampString = "373964277.632723"
-         startingColumnNumber = "9223372036854775807"
-         endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "48"
-         endingLineNumber = "48"
-         landmarkName = "-exitAction:"
+         startingLineNumber = "1793"
+         endingLineNumber = "1793"
+         landmarkName = "-enqueueBuffer"
          landmarkType = "5">
       </FileBreakpoint>
    </FileBreakpoints>

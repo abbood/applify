@@ -428,14 +428,88 @@ void ASReadStreamCallBack
 	{
 		if (errorCode != AS_NO_ERROR ||
 			(state == AS_STOPPED &&
-			stopReason != AS_STOPPING_TEMPORARILY))
+             stopReason != AS_STOPPING_TEMPORARILY) || [self hasNetworkTimedOut])
+            
 		{
-			return YES;
-		}
+            [self printState:state];
+            NSLog(@"CLIENT: runLOOP SHOULD EXIT!!");
+
+            return YES;
+		} else {
+			NSLog(@"CLIENT: run loop shouldn't exit!!");
+        }
 	}
 	
 	return NO;
 }
+
+-(void)printState:(AudioStreamerState)state
+{
+    switch (state) {
+        case AS_INITIALIZED:
+            NSLog(@"AudioStreamerState: AS_INITIALIZED");
+            break;
+            
+        case AS_STARTING_FILE_THREAD:
+            NSLog(@"AudioStreamerState: AS_STARTING_FILE_THREAD");
+            break;
+            
+        case AS_WAITING_FOR_DATA:
+            NSLog(@"AudioStreamerState: AS_WAITING_FOR_DATA");
+            break;
+            
+        case AS_WAITING_FOR_QUEUE_TO_START:
+            NSLog(@"AudioStreamerState: AS_WAITING_FOR_QUEUE_TO_START");
+            break;
+            
+        case AS_READY_TO_PLAY:
+            NSLog(@"AudioStreamerState: AS_READY_TO_PLAY");
+            break;
+            
+        case AS_PLAYING:
+            NSLog(@"AudioStreamerState: AS_PLAYING");
+            break;
+            
+        case AS_BUFFERING:
+            NSLog(@"AudioStreamerState: AS_BUFFERING");
+            break;
+
+        case AS_STOPPING:
+            NSLog(@"AudioStreamerState: AS_STOPPING");
+            break;
+            
+        case AS_STOPPED:
+            NSLog(@"AudioStreamerState: AS_STOPPED");
+            break;
+            
+        case AS_PAUSED:
+            NSLog(@"AudioStreamerState: AS_PAUSED");
+            break;
+            
+        default:
+            break;
+    }
+    
+    
+}
+
+-(BOOL)hasNetworkTimedOut
+{
+    double curTime = [Timer getCurTime];
+    double timeElapsedSinceLastPacket = [Timer getTimeDifference:_game->lastAudioPacketTimeStamp
+                                                           time2:curTime];
+    
+    BOOL hasNetworkTimedOut = (timeElapsedSinceLastPacket > networkTimeOutTime);
+    
+    if (hasNetworkTimedOut) {
+        NSLog(@"network timed out! b/c cur time is %f and last packet time is %f, differnece is %f",curTime, _game->lastAudioPacketTimeStamp,timeElapsedSinceLastPacket);
+    } else {
+        NSLog(@"network DID NOT timed out! b/c cur time is %f and last packet time is %f, differnece is %f",curTime, _game->lastAudioPacketTimeStamp,timeElapsedSinceLastPacket);
+    }
+    
+    return (hasNetworkTimedOut);
+}
+
 
 //
 // stringForErrorCode:
@@ -768,63 +842,101 @@ void ASReadStreamCallBack
 }
 
 
+
 /*
- * we read the audio data from the ring buffer as well as 
- * the packet descriptions (VBR data). 
+ * we read the audio data from the ring buffer as well as
+ * the packet descriptions (VBR data).
  */
 
 -(BOOL)readFromRingBuffer
 {
-    do {
-     //   NSLog(@"READER: readFromRingBuffer:");
 
-        void *readPointer;
-        allBytesAvailable = [ringBuffer lengthAvailableToReadReturningPointer:&readPointer];
-
-        if (allBytesAvailable == 0) {
-             NSLog(@"READER: OOOOOPTS.. NOTHING TO READ YET.. EXIT THE READ FROM RING BUFFER");
-            continue;
-        }
-
-        NSLog(@"READER: these are the bytes we are about to read from ring buffer %lu",allBytesAvailable);
-        // we store all the bytes grabbed unto ringBufferReadData first, so that we can 
-        // purge the ring buffer the best we can
-        NSData * ringBufferReadData = [NSData dataWithBytes:readPointer length:allBytesAvailable];
-        [ringBuffer didReadLength:allBytesAvailable];
-        
-        UInt32 ringBufferReadDataOffset = 0;
-        while (ringBufferReadDataOffset < allBytesAvailable) {
-            int packetBytesFilled = [[ringBufferReadData subdataWithRange:NSMakeRange(12 + ringBufferReadDataOffset, 4)] rw_int32AtOffset:0];
-
-            int packetDescriptionsBytesFilled = [[ringBufferReadData subdataWithRange:NSMakeRange(16 + ringBufferReadDataOffset, 4)] rw_int32AtOffset:0]; 
-        
-
-
-            int offset = AUDIO_BUFFER_PACKET_HEADER_SIZE + ringBufferReadDataOffset;            
-            NSData* audioBufferData = [NSData dataWithBytes:(char *)([ringBufferReadData bytes] + offset) length:packetBytesFilled];
-
-
-            offset += packetBytesFilled ;
-            NSData *packetDescriptionsData = [NSData dataWithBytes:(char *)([ringBufferReadData bytes] + offset) length:packetDescriptionsBytesFilled];                        
-
-            UInt32 inNumberPackets = packetDescriptionsBytesFilled/AUDIO_STREAM_PACK_DESC_SIZE;
-            AudioStreamPacketDescription *inPacketDescriptions;
-
-            
-            inPacketDescriptions = [self populatePacketDescriptionArray:packetDescriptionsData
-                         packetDescriptionNumber:inNumberPackets];
-  
-            
-            [self handleAudioPackets:[audioBufferData bytes]
-                         numberBytes:packetBytesFilled
-                       numberPackets:inNumberPackets
-                  packetDescriptions:inPacketDescriptions];
-            
-            ringBufferReadDataOffset += AUDIO_BUFFER_PACKET_HEADER_SIZE + packetBytesFilled + packetDescriptionsBytesFilled;
-        }                
-    } while (true);
     
+    
+    NSLog(@"READER: readFromRingBuffer, setting streamer state to AS_BUFFERING");
+    state = AS_BUFFERING;
+    
+    NSDate *fireDate = [NSDate dateWithTimeIntervalSinceNow:0];
+    ringBufferReaderTimer = [[NSTimer alloc] initWithFireDate:fireDate
+                                                     interval:0.25
+                                                       target:self
+                                                     selector:@selector(readRingBufferDataBit)
+                                                     userInfo:NULL
+                                                      repeats:YES];
+    
+    NSRunLoop *runLoop = [NSRunLoop currentRunLoop];
+    NSLog(@"this is the runloops current mode %@",[runLoop currentMode]);
+    [runLoop addTimer:ringBufferReaderTimer forMode:NSDefaultRunLoopMode];
+    [ringBufferReaderTimer fire];
+    NSLog(@"end of readFromRingBuffer");
+    return YES;
 }
+
+-(void)readRingBufferDataBit
+{
+    if (state == AS_STOPPED) {
+        [ringBufferReaderTimer invalidate];
+        return;
+    }
+    
+    void *readPointer;
+    allBytesAvailable = [ringBuffer lengthAvailableToReadReturningPointer:&readPointer];
+    
+    if (allBytesAvailable == 0) {
+        NSLog(@"READER: OOOOOPTS.. NOTHING TO READ YET.. EXIT THE READ FROM RING BUFFER");
+        return;
+    }    
+    
+    // we store all the bytes grabbed unto ringBufferReadData first, so that we can
+    // purge the ring buffer the best we can
+    NSData * ringBufferReadData = [NSData dataWithBytes:readPointer length:allBytesAvailable];
+    // NSLog(@"READER: THESE ARE THE BYTES WE ARE ABOUT TO READ FROM RING BUFFER %lu ",allBytesAvailable);
+    
+    [ringBuffer didReadLength:allBytesAvailable];
+
+    
+    UInt32 ringBufferReadDataOffset = 0;
+    while (ringBufferReadDataOffset < allBytesAvailable) {        
+        
+        NSData * packetData = [ringBufferReadData subdataWithRange:NSMakeRange(8 + ringBufferReadDataOffset, 2)];
+        PacketType packetType = [packetData rw_int16AtOffset:0];
+        packetData = [ringBufferReadData subdataWithRange:NSMakeRange(4 + ringBufferReadDataOffset, 4)];
+        UInt32 packNumber = [packetData rw_int32AtOffset:0];
+        int packetBytesFilled = [[ringBufferReadData subdataWithRange:NSMakeRange(12 + ringBufferReadDataOffset, 4)] rw_int32AtOffset:0];
+        int packetDescriptionsBytesFilled = [[ringBufferReadData subdataWithRange:NSMakeRange(16 + ringBufferReadDataOffset, 4)] rw_int32AtOffset:0];
+                
+        
+        int offset = AUDIO_BUFFER_PACKET_HEADER_SIZE + ringBufferReadDataOffset;
+        NSData* audioBufferData = [NSData dataWithBytes:(char *)([ringBufferReadData bytes] + offset) length:packetBytesFilled];
+        
+        
+        offset += packetBytesFilled ;
+        NSData *packetDescriptionsData = [NSData dataWithBytes:(char *)([ringBufferReadData bytes] + offset) length:packetDescriptionsBytesFilled];
+        
+        UInt32 inNumberPackets = packetDescriptionsBytesFilled/AUDIO_STREAM_PACK_DESC_SIZE;
+        AudioStreamPacketDescription *inPacketDescriptions;
+        
+        
+        inPacketDescriptions = [self populatePacketDescriptionArray:packetDescriptionsData
+                                            packetDescriptionNumber:inNumberPackets];
+        
+        
+        if (inPacketDescriptions[0].mDataByteSize > 65536)
+        {
+            NSLog(@"packet description size is abnormally large.. soething is wrong");
+        }
+        
+        
+        [self handleAudioPackets:[audioBufferData bytes]
+                     numberBytes:packetBytesFilled
+                   numberPackets:inNumberPackets
+              packetDescriptions:inPacketDescriptions];
+                        
+        ringBufferReadDataOffset += AUDIO_BUFFER_PACKET_HEADER_SIZE + packetBytesFilled + packetDescriptionsBytesFilled;
+    }
+ 
+}
+
 
 
 -(AudioStreamPacketDescription *)populatePacketDescriptionArray:(NSData *)packetDescData
@@ -1152,36 +1264,22 @@ void ASReadStreamCallBack
 			}
 			self.state = AS_BUFFERING;
 		}
-	} while (true);
+	} while (isRunning && ![self runLoopShouldExit]);
 	
 cleanup:
 
 	@synchronized(self)
 	{
+        NSLog(@"CLIENT: emptying ring buffer");
+        
 		//
-		// Cleanup the read stream if it is still open
+		// Empty Audio Queue.. may be used later
 		//
-		if (stream)
-		{
-			CFReadStreamClose(stream);
-			CFRelease(stream);
-			stream = nil;
-		}
-		
-		//
-		// Close the audio file strea,
-		//
-		if (audioFileStream)
-		{
-			err = AudioFileStreamClose(audioFileStream);
-			audioFileStream = nil;
-			if (err)
-			{
-				[self failWithErrorCode:AS_FILE_STREAM_CLOSE_FAILED];
-			}
-		}
-		
-		//
+        if (_game->ringBuffer) {
+            [_game->ringBuffer empty];
+        }
+        
+        //
 		// Dispose of the Audio Queue
 		//
 		if (audioQueue)
@@ -1193,6 +1291,16 @@ cleanup:
 				[self failWithErrorCode:AS_AUDIO_QUEUE_DISPOSE_FAILED];
 			}
 		}
+        
+
+        // reset reading state so that we can reinitailize reader
+        // in the future if necessary
+        _game->hasStartedReading = false;
+        _game->_state = GameStateWaitingForSignIn;
+        state = AS_STOPPED;
+
+        NSLog(@"CLIENT will call quitgamewithreason");
+        [_game quitGameWithReason:QuitReasonServerQuit];
 
 		pthread_mutex_destroy(&queueBuffersMutex);
 		pthread_cond_destroy(&queueBufferReadyCondition);
@@ -1224,7 +1332,7 @@ cleanup:
 - (void)start
 {
 	
-	 //NSLog(@"streamer starting");
+	 NSLog(@"streamer starting ---> setting state to AS_STARTING_FILE_THREAD");
 	
 	
 	@synchronized (self)
@@ -2364,5 +2472,6 @@ static void ASAudioQueueIsRunningCallback(void *inUserData, AudioQueueRef inAQ, 
 #endif
 
 @end
+
 
 

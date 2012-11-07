@@ -41,6 +41,7 @@ const size_t AUDIO_STREAM_PACK_DESC_SIZE = 12; // = sizeof(AudioStreamPacketDesc
 
 @synthesize packetType = _packetType;
 @synthesize bodyData = _bodyData;
+@synthesize sendReliably = _sendReliably;
 
 + (id)packetWithType:(PacketType)packetType
 {
@@ -71,6 +72,8 @@ const size_t AUDIO_STREAM_PACK_DESC_SIZE = 12; // = sizeof(AudioStreamPacketDesc
 		case PacketTypeSignInRequest:
         case PacketTypeClientReady:
         case PacketTypeRingBufferGettingClear:
+        case PacketTypeServerQuit:
+		case PacketTypeClientQuit:
 			packet = [Packet packetWithType:packetType];
 			break;
             
@@ -117,6 +120,7 @@ const size_t AUDIO_STREAM_PACK_DESC_SIZE = 12; // = sizeof(AudioStreamPacketDesc
 	if ((self = [super init]))
 	{
 		self.packetType = packetType;
+        self.sendReliably = YES;
 	}
 	return self;
 }

@@ -29,7 +29,11 @@ typedef enum
     
     PacketTypeAudioBuffer,                                  //71
     PacketTypeRingBufferGettingFull,
-    PacketTypeRingBufferGettingClear
+    PacketTypeRingBufferGettingClear,
+        
+	PacketTypeOtherClientQuit,         // server to client
+	PacketTypeServerQuit,              // server to client
+	PacketTypeClientQuit,              // client to server
     
 }
 PacketType;
@@ -39,6 +43,7 @@ PacketType;
 
 @property (nonatomic, assign) PacketType packetType;
 @property (nonatomic, copy) NSData * bodyData;
+@property (nonatomic, assign) BOOL sendReliably;
 
 + (id)packetWithType:(PacketType)packetType;
 - (id)initWithType:(PacketType)packetType;
