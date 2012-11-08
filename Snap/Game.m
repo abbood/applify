@@ -901,7 +901,7 @@ static void CheckError (OSStatus error, const char *operation)
         sprintf(errorString, "%d", (int)error);
     fprintf(stderr, "error: %s (%s)\n", operation, errorString);
     
-    exit(1);5
+    exit(1);
 }
 
     
