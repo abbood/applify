@@ -495,6 +495,11 @@ void ASReadStreamCallBack
 
 -(BOOL)hasNetworkTimedOut
 {
+    if (PacketTypeEndOfSong) {
+        // if host reached end of song, then we don't worry about receiving any more packets
+        return NO;
+    }
+    
     double curTime = [Timer getCurTime];
     double timeElapsedSinceLastPacket = [Timer getTimeDifference:_game->lastAudioPacketTimeStamp
                                                            time2:curTime];

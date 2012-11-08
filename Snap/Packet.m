@@ -74,6 +74,7 @@ const size_t AUDIO_STREAM_PACK_DESC_SIZE = 12; // = sizeof(AudioStreamPacketDesc
         case PacketTypeRingBufferGettingClear:
         case PacketTypeServerQuit:
 		case PacketTypeClientQuit:
+        case PacketTypeEndOfSong:
 			packet = [Packet packetWithType:packetType];
 			break;
             

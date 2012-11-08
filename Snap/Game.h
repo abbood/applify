@@ -98,6 +98,7 @@ GameState;
     NSMutableArray *serverPacketProfiler;
     NSMutableArray *clientPacketProfiler;            
     UInt8 numProfilePackets;
+    BOOL isHostAtEndOfSong;
 
     
     @public

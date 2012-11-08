@@ -34,6 +34,7 @@ typedef enum
 	PacketTypeOtherClientQuit,         // server to client
 	PacketTypeServerQuit,              // server to client
 	PacketTypeClientQuit,              // client to server
+    PacketTypeEndOfSong,
     
 }
 PacketType;

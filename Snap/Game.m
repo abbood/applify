@@ -292,6 +292,14 @@
         }
         break;
             
+        case PacketTypeEndOfSong:
+        {
+            NSLog(@"CLIENT received packet PacketTypeEndOfSong");
+            isHostAtEndOfSong = YES;
+            
+        }
+        break;
+            
 		
         default:
 			 NSLog(@"Client received unexpected packet: %@", packet);
@@ -529,8 +537,11 @@ void CalculateBytesForTime(AudioStreamBasicDescription inDesc, Float64 inSeconds
           //      [Logger Log:@"SERVER->ClIENT TELL clients to START PLAYING MUSIC!!"];
                 NSLog(@"all players are primed now!");
                 
+                [hostViewController.musicPlayer skipToBeginning];
+                
                 Packet *packet = [Packet packetWithType:PacketTypePlayMusicNow];
-                [self sendPacketToAllClientsUnreliable:packet];
+                packet.sendReliably = false;
+                [self sendPacketToAllClients:packet];
                 
                 [hostViewController.musicPlayer play];
                 
@@ -794,7 +805,8 @@ void CalculateBytesForTime(AudioStreamBasicDescription inDesc, Float64 inSeconds
          obj.receivedResponse = [_session.peerID isEqualToString:obj.peerID];
      }];
     
-	GKSendDataMode dataMode = GKSendDataReliable;
+	GKSendDataMode dataMode = packet.sendReliably ? GKSendDataReliable : GKSendDataUnreliable;
+    
 	NSData *data = [packet data];
 	NSError *error;
     
@@ -807,30 +819,9 @@ void CalculateBytesForTime(AudioStreamBasicDescription inDesc, Float64 inSeconds
     
 }
 
-- (void)sendPacketToAllClientsUnreliable:(Packet *)packet
-{
-    [_players enumerateKeysAndObjectsUsingBlock:^(id key, Player *obj, BOOL *stop)
-     {
-         obj.receivedResponse = [_session.peerID isEqualToString:obj.peerID];
-     }];
-    
-	GKSendDataMode dataMode = GKSendDataUnreliable;
-	NSData *data = [packet data];
-	NSError *error;
-    
-    NSLog(@"sendPacketToAllClients: about to send packet to all peers with data %@",data);
-	if (![_session sendDataToAllPeers:data withDataMode:dataMode error:&error])
-	{
-        NSLog(@"Error sending data to clients: %@", error);
-	}
-    NSLog(@"done sendint packet to all clients");
-    
-}
-
-
 - (void)sendPacketToServer:(Packet *)packet
 {
-	GKSendDataMode dataMode = GKSendDataReliable;
+	GKSendDataMode dataMode = packet.sendReliably ? GKSendDataReliable : GKSendDataUnreliable;
 	NSData *data = [packet data];
 	NSError *error;
     NSLog(@"sending packet to server with data %@ ", data);
@@ -841,18 +832,6 @@ void CalculateBytesForTime(AudioStreamBasicDescription inDesc, Float64 inSeconds
 	}
 }
 
-- (void)sendPacketToServerUnreliable:(Packet *)packet
-{
-	GKSendDataMode dataMode = GKSendDataUnreliable;
-	NSData *data = [packet data];
-	NSError *error;
-    NSLog(@"sending packet to server with data %@ ", data);
-    
-	if (![_session sendData:data toPeers:[NSArray arrayWithObject:_serverPeerID] withDataMode:dataMode error:&error])
-	{
-        NSLog(@"Error sending data to server: %@", error);
-	}
-}
 
 -(void)sendPacketToClient:(Packet *)packet
                    peerID:(NSString*)peerID
@@ -922,7 +901,7 @@ static void CheckError (OSStatus error, const char *operation)
         sprintf(errorString, "%d", (int)error);
     fprintf(stderr, "error: %s (%s)\n", operation, errorString);
     
-    exit(1);
+    exit(1);5
 }
 
     
@@ -936,6 +915,17 @@ static void CheckError (OSStatus error, const char *operation)
     memcpy(&asbd, asbdPointer, sizeof(asbd));
     //asbd now contains a basic description for the track
     return asbd;
+}
+
+-(UInt32)getBroadCastInterval
+{
+    UInt32 playersCount = [_players count] -1;
+    if (playersCount == 1)
+        return 2.15;
+    else if (playersCount > 1)
+        return 0;
+    else
+        return 0;
 }
 
 
@@ -953,7 +943,7 @@ static void CheckError (OSStatus error, const char *operation)
         
         NSDate *fireDate = [NSDate dateWithTimeIntervalSinceNow:0];
         sampleBroadcastTimer = [[NSTimer alloc] initWithFireDate:fireDate
-                                                  interval:2.15
+                                                  interval:[self getBroadCastInterval]
                                                     target:self
                                                   selector:@selector(broadcastSample)
                                                   userInfo:NULL
@@ -1028,7 +1018,12 @@ static void CheckError (OSStatus error, const char *operation)
     CMSampleBufferRef sample;
     sample = [readerOutput copyNextSampleBuffer];
     
-    if (!sample) {  
+    CMItemCount numSamples = CMSampleBufferGetNumSamples(sample);
+    
+    if (!sample || (numSamples == 0)) {
+        Packet *packet = [Packet packetWithType:PacketTypeEndOfSong];
+        packet.sendReliably = NO;
+        [self sendPacketToAllClients:packet];
         [sampleBroadcastTimer invalidate];
         return;
     }
@@ -1037,11 +1032,7 @@ static void CheckError (OSStatus error, const char *operation)
     NSLog(@"SERVER: going through sample loop");
     Boolean isBufferDataReady = CMSampleBufferDataIsReady(sample);
     
-    if (!isBufferDataReady) {
-        while (!isBufferDataReady) {
-            //NSLog(@"buffer is not ready!");
-        }
-    }
+
     
     CMBlockBufferRef CMBuffer = CMSampleBufferGetDataBuffer( sample );                                                         
     AudioBufferList audioBufferList;  
