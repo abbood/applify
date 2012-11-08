@@ -1,21 +1,34 @@
 
 #import "AppDelegate.h"
 #import "MainViewController.h"
-
+#import "JoinViewController.h"
+#import "MusicTableViewController.h"
+#import "Simple_PlayerViewController.h"
 @implementation AppDelegate
 
 @synthesize window = _window;
 @synthesize viewController = _viewController;
+@synthesize navController;
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
-	self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
-	self.viewController = [[MainViewController alloc] initWithNibName:@"MainViewController" bundle:nil];
-	self.window.rootViewController = self.viewController;
-	[self.window makeKeyAndVisible];
-
-	[application setIdleTimerDisabled:YES];
-	return YES;
+    self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
+    MainViewController  *mainviewcontroller = [[MainViewController alloc] initWithNibName:@"MainViewController" bundle:nil];
+    // Override point for customization after application launch.
+    
+    self.window.backgroundColor = [UIColor whiteColor];
+    
+    [self.window makeKeyAndVisible];
+    
+    UINavigationController *navcontroller=[[UINavigationController alloc]initWithRootViewController:mainviewcontroller];
+    
+    [self setNavController:navController];
+    
+    [self.window setRootViewController:navcontroller];
+    
+    [navcontroller setNavigationBarHidden:YES];
+    
+    return YES;
 }
 
 - (void)applicationWillResignActive:(UIApplication *)application
@@ -29,7 +42,7 @@
 - (void)applicationDidEnterBackground:(UIApplication *)application
 {
 	/*
-	 Use this method to release shared resources, save user data, invalidate timers, and store enough application state information to restore your application to its current state in case it is terminated later. 
+	 Use this method to release shared resources, save user data, invalidate timers, and store enough application state information to restore your application to its current state in case it is terminated later.
 	 If your application supports background execution, this method is called instead of applicationWillTerminate: when the user quits.
 	 */
 }
@@ -56,5 +69,11 @@
 	 See also applicationDidEnterBackground:.
 	 */
 }
-
+-(void)recevierController
+{
+    self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
+	self.viewController = [[GameViewController alloc] initWithNibName:@"GameViewController" bundle:nil];
+	[self.viewController presentModalViewController:self.viewController animated:YES];
+	[self.window makeKeyAndVisible];
+}
 @end

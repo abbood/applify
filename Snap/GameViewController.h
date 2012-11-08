@@ -8,13 +8,15 @@
 
 
 #import "Game.h"
+#import "GameDelegate.h"
 
 #include <AudioToolbox/AudioToolbox.h>
 #include <CoreMedia/CoreMedia.h>
 #include <CoreAudio/CoreAudioTypes.h>
 
 @class GameViewController;
-@class Game;
+
+#define kAQMaxPacketDescs 6
 
 @protocol GameViewControllerDelegate <NSObject>
 

@@ -234,9 +234,6 @@
     Game *game=[[Game alloc]init];
     game.joinviewcontroller=self;
     
-    
-    
-    
 }
 
 - (void)viewDidUnload
@@ -262,7 +259,7 @@
 		self.nameTextField.placeholder = _matchmakingClient.session.displayName;
 		[self.tableView reloadData];
         
-        //    [self MainGui];
+        [self MainGui];
 	}
 }
 
