@@ -222,13 +222,20 @@
     
     NSOperationQueue *queue=[NSOperationQueue new];
     
-    NSInvocationOperation *operation=[[NSInvocationOperation alloc]initWithTarget:self selector:@selector(MainGui) object:nil];
+    NSInvocationOperation *operation=[[NSInvocationOperation alloc]initWithTarget:self
+                                                                         selector:@selector(MainGui)
+                                                                           object:nil];
     [queue addOperation:operation];
     
-    NSInvocationOperation *operation2=[[NSInvocationOperation alloc]initWithTarget:self selector:@selector(callavaiablserver) object:nil];
+    NSInvocationOperation *operation2=[[NSInvocationOperation alloc]initWithTarget:self
+                                                                          selector:@selector(callavaiablserver)
+                                                                            object:nil];
     [queue addOperation:operation2];
     
-    NSURL* firstUrl = [NSURL fileURLWithPath:[[NSBundle mainBundle] pathForResource:@"loading-spinner" ofType:@"gif"]];
+    NSURL* firstUrl = [NSURL fileURLWithPath:[[NSBundle mainBundle]
+                                              pathForResource:@"loading-spinner"
+                                              ofType:@"gif"]];
+    
     UIImageView * firstAnimation = [AnimatedGif getAnimationForGifAtUrl: firstUrl];
     [spinner addSubview:firstAnimation];
     Game *game=[[Game alloc]init];
@@ -257,9 +264,7 @@
 		[_matchmakingClient startSearchingForServersWithSessionID:SESSION_ID];
         NSLog(@"avaliable server count:%d",[_matchmakingClient availableServerCount]);
 		self.nameTextField.placeholder = _matchmakingClient.session.displayName;
-		[self.tableView reloadData];
-        
-        [self MainGui];
+		[self.tableView reloadData];        
 	}
 }
 
@@ -435,13 +440,13 @@
 {
     return [_matchmakingClient availableServerCount];
 }
-int timer2=100;
+int counter=100;
 bool isFound=FALSE;
 int fserverCount=0;
 -(void)MainGui
 {
     NSLog(@"%@", [NSThread callStackSymbols]);
-    while (timer2!=0 && fserverCount==0)
+    while (counter!=0 && fserverCount==0)
     {
         //spinner image
         spinner.hidden=false;
@@ -449,7 +454,7 @@ int fserverCount=0;
         
         fserverCount=[_matchmakingClient availableServerCount];
         NSLog(@"Number of peers:%d",fserverCount);
-        if (timer2==1)
+        if (counter==1)
         {
             NSLog(@"timer =0");
             //hide spinner
@@ -463,13 +468,11 @@ int fserverCount=0;
             
             
             [alert show];
-            return;
-            //set timer
-            
+            return;            
             
         }
-        timer2--;
-        NSLog(@"%d\n",timer2);
+        counter--;
+        NSLog(@"%d\n",counter);
     }
     [self.view addSubview:self.waitView];
     
@@ -482,7 +485,7 @@ int fserverCount=0;
     NSString *title = [alertView buttonTitleAtIndex:buttonIndex];
     if([title isEqualToString:@"Tap to retry"])
     {
-        timer2=5;
+        counter=5;
         [spinner setHidden:FALSE];
         [self performSelector:@selector( MainGui) withObject:nil afterDelay:1];
     }

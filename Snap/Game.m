@@ -197,6 +197,15 @@
     
 	switch (recievedPacket.packetType)
 	{
+            
+        case PacketTypeChangeView:
+        {
+            NSLog(@"CLIENT: we just recieved a chagne view packet");
+            
+            // will be used later for further processing
+        }
+            
+            
 		case PacketTypeSignInRequest:
         {
             NSLog(@"CLIENT: received sign in request");

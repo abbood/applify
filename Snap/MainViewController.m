@@ -52,54 +52,15 @@
     NSURL* firstUrl = [NSURL fileURLWithPath:[[NSBundle mainBundle] pathForResource:@"loading-spinner" ofType:@"gif"]];
     UIImageView * firstAnimation = [AnimatedGif getAnimationForGifAtUrl: firstUrl];
     [spinner addSubview:firstAnimation];
-   // _timer = [Timer new];
-   // [_timer setCurrentTimeAsReferencepoint];
-   // [Timer printCurTime];
-    
-    //[_timer getAbsTimeInFuture];
-    
-    [self performSelector:@selector(performAction2) withObject:NULL afterDelay:3];
-    [self performSelector:@selector(performAction2) withObject:NULL afterDelay:5];
-    [self performAction];
-    
+        
 }
 
 
--(void)performAction2
-{
-    //[_timer getTimeElapsedInMilliSec];   
-    [Timer printCurTime];
-}
 
-
--(void)performAction
-{
-    double curTime = [Timer getCurTime];
-    double timeInFuture = 2 + curTime;
-    NSLog(@"this is time in future in abs terms %f and this is curTime %f",timeInFuture, curTime);
-
-    [Timer printTime:timeInFuture];
-    [Timer printTime:curTime];
-    
-    CFDateRef futureDate = CFDateCreate(NULL, timeInFuture);
-    CFDateRef dateNow = CFDateCreate(NULL, curTime);
-    Boolean keepTesting = true;
-    
-    while (keepTesting) {
-        dateNow = CFDateCreate(NULL, [Timer getCurTime]);
-        if (CFDateCompare(dateNow, futureDate,NULL) >= 0)   // ie both times are equal
-        {
-            NSLog(@"now is the time!");
-            keepTesting = false;
-            return;
-        } else {
-            NSLog(@"now isn't the time.. skip");
-        }
-    }
-}
 
 - (void)viewWillAppear:(BOOL)animated
 {
+    NSLog(@"I AM MAIN VIEW AND I APPEARED!");
 	[super viewWillAppear:animated];
     
     JoinViewController *controller = [[JoinViewController alloc] initWithNibName:@"JoinViewController" bundle:nil];
@@ -111,6 +72,7 @@
 
 - (void)viewDidAppear:(BOOL)animated
 {
+    
 	[super viewDidAppear:animated];
     
 	if (_performAnimations)
