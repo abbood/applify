@@ -11,6 +11,7 @@
 #import "UIFont+SnapAdditions.h"
 #import "PeerCell.h"
 #import "MainViewController.h"
+#import "TestTableCell.h"
 
 @interface HostViewController ()
 @property (nonatomic, weak) IBOutlet UILabel *headingLabel;
@@ -20,6 +21,12 @@
 @property (nonatomic, weak) IBOutlet UITableView *tableView;
 @property (nonatomic, weak) IBOutlet UIButton *startButton;
 @property (nonatomic, weak) IBOutlet UIButton *broadcastMusicButton;
+
+@property (nonatomic,retain) UIButton *Plus;
+@property (nonatomic,retain) UIButton *List;
+@property (nonatomic,retain) UIButton *Speaker;
+//
+@property (nonatomic,retain) UITableView *Table;
 @end
 
 @implementation HostViewController
@@ -42,6 +49,21 @@
 //		since application launch.
 @synthesize musicPlayer;				// the music player, which plays media items from the iPod library
 
+@synthesize timer;
+@synthesize Plus;
+@synthesize List;
+@synthesize cellarray;
+@synthesize Table;
+@synthesize Play;
+@synthesize Pre;
+@synthesize Next;
+@synthesize Volume;
+@synthesize listData;
+@synthesize SongImage;
+@synthesize SongName;
+@synthesize AlbumName;
+@synthesize SongDuration;
+@synthesize ProgressBar;
 
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
@@ -56,13 +78,6 @@
 - (void)viewDidLoad
 {
 	[super viewDidLoad];
-    
-	self.headingLabel.font = [UIFont rw_snapFontWithSize:24.0f];;
-	self.nameLabel.font = [UIFont rw_snapFontWithSize:16.0f];
-	self.statusLabel.font = [UIFont rw_snapFontWithSize:16.0f];
-	self.nameTextField.font = [UIFont rw_snapFontWithSize:20.0f];
-    
-	[self.startButton rw_applySnapStyle];
     
     [self setupApplicationAudio];
     
@@ -87,19 +102,19 @@
 		_matchmakingServer.maxClients = 3;
         _matchmakingServer.delegate = self;
 		[_matchmakingServer startAcceptingConnectionsForSessionID:SESSION_ID];
-        
-		self.nameTextField.placeholder = _matchmakingServer.session.displayName;
-		[self.tableView reloadData];
+        [self.tableView reloadData];
 	}
 }
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
 {
-	return UIInterfaceOrientationIsLandscape(interfaceOrientation);
+	return FALSE;
 }
 
 - (IBAction)startAction:(id)sender
 {
+    NSLog(@"----------------------------\n");
+    NSLog(@"<%@:%@:%d>", NSStringFromClass([self class]), NSStringFromSelector(_cmd), __LINE__);
 	if (_matchmakingServer != nil && [_matchmakingServer connectedClientCount] > 0)
 	{
 		NSString *name = [self.nameTextField.text stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
@@ -108,10 +123,10 @@
         
 		[_matchmakingServer stopAcceptingConnections];
         
-		[self.delegate hostViewController:self 
+		[self.delegate hostViewController:self
                      startGameWithSession:_matchmakingServer.session
                                playerName:name
-                                  clients:_matchmakingServer.connectedClients                            
+                                  clients:_matchmakingServer.connectedClients
          ];
 	}
 }
@@ -141,7 +156,7 @@
         controller.modalTransitionStyle = UIModalTransitionStyleCoverVertical;
         [self presentModalViewController: controller animated: YES];
         // else, if no music is chosen yet, display the media item picker
-	} else {        
+	} else {
 		MPMediaPickerController *picker =
         [[MPMediaPickerController alloc] initWithMediaTypes: MPMediaTypeMusic];
 		
@@ -158,7 +173,7 @@
 }
 
 // Invoked by the delegate of the media item picker when the user is finished picking music.
-//		The delegate is either this class or the table view controller, depending on the 
+//		The delegate is either this class or the table view controller, depending on the
 //		state of the application.
 - (void) updatePlayerQueueWithMediaCollection: (MPMediaItemCollection *) mediaItemCollection {
     
@@ -169,11 +184,11 @@
 		if (userMediaItemCollection == nil) {
 			// apply the new media item collection as a playback queue for the music player
 			[self setUserMediaItemCollection: mediaItemCollection];
-                        
+            
 			[musicPlayer setQueueWithItemCollection: userMediaItemCollection];
 			[self setPlayedMusicOnce: YES];
-		//	[musicPlayer play];
-
+            //	[musicPlayer play];
+            
             // Obtain the music player's state so it can then be
             //		restored after updating the playback queue.
 		} else {
@@ -195,7 +210,7 @@
 			[combinedMediaItems addObjectsFromArray: newMediaItems];
 			
 			[self setUserMediaItemCollection: [MPMediaItemCollection collectionWithItems: (NSArray *) combinedMediaItems]];
-
+            
             
 			// Apply the new media item collection as a playback queue for the music player.
 			[musicPlayer setQueueWithItemCollection: userMediaItemCollection];
@@ -209,26 +224,26 @@
 				[musicPlayer play];
 			}
 		}
-  /*      
-		// Finally, because the music player now has a playback queue, ensure that 
-		//		the music play/pause button in the Navigation bar is enabled.
-		navigationBar.topItem.leftBarButtonItem.enabled = YES;
-        
-		[addOrShowMusicButton	setTitle: NSLocalizedString (@"Show Music", @"Alternate title for 'Add Music' button, after user has chosen some music")
-                              forState: UIControlStateNormal];*/
+        /*
+         // Finally, because the music player now has a playback queue, ensure that
+         //		the music play/pause button in the Navigation bar is enabled.
+         navigationBar.topItem.leftBarButtonItem.enabled = YES;
+         
+         [addOrShowMusicButton	setTitle: NSLocalizedString (@"Show Music", @"Alternate title for 'Add Music' button, after user has chosen some music")
+         forState: UIControlStateNormal];*/
 	}
 }
 
 // If the music player was paused, leave it paused. If it was playing, it will continue to
 //		play on its own. The music player state is "stopped" only if the previous list of songs
-//		had finished or if this is the first time the user has chosen songs after app 
+//		had finished or if this is the first time the user has chosen songs after app
 //		launch--in which case, invoke play.
 - (void) restorePlaybackState {
     
 	if (musicPlayer.playbackState == MPMusicPlaybackStateStopped && userMediaItemCollection) {
         
-	/*	[addOrShowMusicButton	setTitle: NSLocalizedString (@"Show Music", @"Alternate title for 'Add Music' button, after user has chosen some music")
-                              forState: UIControlStateNormal];*/
+        /*	[addOrShowMusicButton	setTitle: NSLocalizedString (@"Show Music", @"Alternate title for 'Add Music' button, after user has chosen some music")
+         forState: UIControlStateNormal];*/
 		
 		if (playedMusicOnce == NO) {
             
@@ -250,26 +265,105 @@
 	else
 		return 0;
 }
+-(CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section
+{
+    return 30;
+}
+-(UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section
+{
+    UIView *headerView=[[UIView alloc]initWithFrame:CGRectMake(0, 0, tableView.frame.size.width, 30)];
+    UIImage *myImage=[UIImage imageNamed:@"HeaderBackground.png"];
+    UIImageView *imageView=[[UIImageView alloc]initWithImage:myImage];
+    imageView.frame=CGRectMake(0,0,tableView.frame.size.width, 30);
+    
+    UILabel *detailLabel = [[UILabel alloc] initWithFrame:CGRectZero];
+    detailLabel.backgroundColor = [UIColor clearColor];
+    detailLabel.textColor = [UIColor whiteColor];
+    detailLabel.text = @"Connect To Speakers...";
+    detailLabel.font = [UIFont systemFontOfSize:16];
+    detailLabel.frame = CGRectMake(10,2,230,30);
+    
+    UIActivityIndicatorView *indicatorView=[[UIActivityIndicatorView alloc]initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhite];
+    indicatorView.frame=CGRectMake(tableView.frame.size.width-30, 0, 3, 30);
+    [headerView addSubview:imageView];
+    [headerView addSubview:detailLabel];
+    [headerView addSubview:indicatorView];
+    [indicatorView startAnimating];
+    return headerView;
+}
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-	static NSString *CellIdentifier = @"CellIdentifier";
     
-	UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
-	if (cell == nil)
-		cell = [[PeerCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier];
     
-	NSString *peerID = [_matchmakingServer peerIDForConnectedClientAtIndex:indexPath.row];
-	cell.textLabel.text = [_matchmakingServer displayNameForPeerID:peerID];
+    TestTableCell *cell=[tableView dequeueReusableCellWithIdentifier:[NSString stringWithFormat:@"%d",indexPath.row]];
     
-	return cell;
+    if (cell==nil)
+    {
+        cell = [[TestTableCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:[NSString stringWithFormat:@"%d",indexPath.row]];
+        
+        NSArray* views = [[NSBundle mainBundle] loadNibNamed:@"TestTableCell" owner:nil options:nil];
+        
+        for (UIView *view in views)
+        {
+            if([view isKindOfClass:[TestTableCell class]])
+            {
+                cell = (TestTableCell*)view;
+            }
+        }
+        
+        cell.row=(int*)indexPath.row;
+        NSString *peerID = [_matchmakingServer peerIDForConnectedClientAtIndex:indexPath.row];
+        cell.PhoneName.text =  [_matchmakingServer displayNameForPeerID:peerID];
+        
+        
+        if ([self.cellarray objectAtIndex:indexPath.row ]!= @"c")
+        {
+            
+            [cell.Speaker setImage:[UIImage imageNamed:@"speakers states2.png"] forState:UIControlStateNormal];
+            
+        }
+        
+        else
+        {
+            [cell.Speaker setSelected:YES];
+            UIImage *myGradient = [UIImage imageNamed:@"Gradient.png"];
+            cell.PhoneName.textColor = [UIColor colorWithPatternImage:myGradient];
+            [cell.Speaker setImage:[UIImage imageNamed:@"speakers states3.png"] forState:UIControlStateSelected];
+            
+        }
+        
+    }
+    ProgressBar.progress+=0.001;
+    
+    return  cell;
 }
 
 #pragma mark - UITableViewDelegate
 
-- (NSIndexPath *)tableView:(UITableView *)tableView willSelectRowAtIndexPath:(NSIndexPath *)indexPath
+//- (NSIndexPath *)tableView:(UITableView *)tableView willSelectRowAtIndexPath:(NSIndexPath *)indexPath
+//{
+//	return YES;
+//}
+
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
-	return nil;
+	[tableView deselectRowAtIndexPath:indexPath animated:YES];
+    NSString *peerID2 = [_matchmakingServer peerIDForConnectedClientAtIndex:indexPath.row];
+    NSLog(@"PeerID2 :%@",peerID2);
+    //    Packet *packet=[[Packet alloc]initWithType:PacketTypeChangeView];
+    //
+    //    Game *game=[[Game alloc]init];
+    //    [game sendPacketToClient:packet peerID:peerID2];
+    NSError *error;
+    Packet *packet = [Packet packetWithType:PacketTypeChangeView];
+    NSData *data = [packet data];
+    if (![_matchmakingServer.session sendData:data
+                                      toPeers:[NSArray arrayWithObject:peerID2]
+                                 withDataMode:GKSendDataUnreliable
+                                        error:&error]) {
+        NSLog(@"Error sending data to clients: %@", error);
+    }
 }
 
 #pragma mark - UITextFieldDelegate
@@ -284,6 +378,7 @@
 
 - (void)matchmakingServer:(MatchmakingServer *)server clientDidConnect:(NSString *)peerID
 {
+    
 	[self.tableView reloadData];
 }
 
@@ -354,19 +449,19 @@
 - (void) setupApplicationAudio {
 	
 	// Gets the file system path to the sound to play.
-//	NSString *soundFilePath = [[NSBundle mainBundle]	pathForResource:	@"sound"
-  //                                                            ofType:				@"caf"];
+    //	NSString *soundFilePath = [[NSBundle mainBundle]	pathForResource:	@"sound"
+    //                                                            ofType:				@"caf"];
     /*
-	// Converts the sound's file path to an NSURL object
-	NSURL *newURL = [[NSURL alloc] initFileURLWithPath: soundFilePath];
-	self.soundFileURL = newURL;
-	[newURL release];*/
+     // Converts the sound's file path to an NSURL object
+     NSURL *newURL = [[NSURL alloc] initFileURLWithPath: soundFilePath];
+     self.soundFileURL = newURL;
+     [newURL release];*/
     
 	// Registers this class as the delegate of the audio session.
 	[[AVAudioSession sharedInstance] setDelegate: self];
 	
 	// The AmbientSound category allows application audio to mix with Media Player
-	// audio. The category also indicates that application audio should stop playing 
+	// audio. The category also indicates that application audio should stop playing
 	// if the Ring/Siilent switch is set to "silent" or the screen locks.
 	[[AVAudioSession sharedInstance] setCategory: AVAudioSessionCategoryAmbient error: nil];
     /*
@@ -382,27 +477,27 @@
      */
     
 	// Registers the audio route change listener callback function
-/*	AudioSessionAddPropertyListener (
-                                     kAudioSessionProperty_AudioRouteChange,
-                                     audioRouteChangeListenerCallback,
-                                     self
-                                     );
-    */
+    /*	AudioSessionAddPropertyListener (
+     kAudioSessionProperty_AudioRouteChange,
+     audioRouteChangeListenerCallback,
+     self
+     );
+     */
 	// Activates the audio session.
 	
 	NSError *activationError = nil;
 	[[AVAudioSession sharedInstance] setActive: YES error: &activationError];
-   /* 
-	// Instantiates the AVAudioPlayer object, initializing it with the sound
-	AVAudioPlayer *newPlayer = [[AVAudioPlayer alloc] initWithContentsOfURL: soundFileURL error: nil];
-	self.appSoundPlayer = newPlayer;
-	[newPlayer release];
-	
-	// "Preparing to play" attaches to the audio hardware and ensures that playback
-	//		starts quickly when the user taps Play
-	[appSoundPlayer prepareToPlay];
-	[appSoundPlayer setVolume: 1.0];
-	[appSoundPlayer setDelegate: self];*/
+    /*
+     // Instantiates the AVAudioPlayer object, initializing it with the sound
+     AVAudioPlayer *newPlayer = [[AVAudioPlayer alloc] initWithContentsOfURL: soundFileURL error: nil];
+     self.appSoundPlayer = newPlayer;
+     [newPlayer release];
+     
+     // "Preparing to play" attaches to the audio hardware and ensures that playback
+     //		starts quickly when the user taps Play
+     [appSoundPlayer prepareToPlay];
+     [appSoundPlayer setVolume: 1.0];
+     [appSoundPlayer setDelegate: self];*/
     
     
     // Instantiate the music player. If you specied the iPod music player in the Settings app,
@@ -413,14 +508,14 @@
 		
 		if ([musicPlayer nowPlayingItem]) {
             
-		//	navigationBar.topItem.leftBarButtonItem.enabled = YES;
+            //	navigationBar.topItem.leftBarButtonItem.enabled = YES;
 			
-			// Update the UI to reflect the now-playing item. 
-		//	[self handle_NowPlayingItemChanged: nil];
+			// Update the UI to reflect the now-playing item.
+            //	[self handle_NowPlayingItemChanged: nil];
 			
-		//	if ([musicPlayer playbackState] == MPMusicPlaybackStatePaused) {
-		//		navigationBar.topItem.leftBarButtonItem = playBarButton;
-		//	}
+            //	if ([musicPlayer playbackState] == MPMusicPlaybackStatePaused) {
+            //		navigationBar.topItem.leftBarButtonItem = playBarButton;
+            //	}
 		}
 		
 	} else {
@@ -431,21 +526,21 @@
 		//		of the built-in iPod app. Here they are both turned off.
 		[musicPlayer setShuffleMode: MPMusicShuffleModeOff];
 		[musicPlayer setRepeatMode: MPMusicRepeatModeNone];
-	}	
+	}
     
 }
 
 // To learn about the Settings bundle and user preferences, see User Defaults Programming Topics
-//		for Cocoa and "The Settings Bundle" in iPhone Application Programming Guide 
+//		for Cocoa and "The Settings Bundle" in iPhone Application Programming Guide
 
 // Returns whether or not to use the iPod music player instead of the application music player.
 - (BOOL) useiPodPlayer {
     
-//	if ([[NSUserDefaults standardUserDefaults] boolForKey: PLAYER_TYPE_PREF_KEY]) {
-		return YES;		
-//	} else {
-//		return NO;
-//	}		
+    //	if ([[NSUserDefaults standardUserDefaults] boolForKey: PLAYER_TYPE_PREF_KEY]) {
+    return YES;		
+    //	} else {
+    //		return NO;
+    //	}		
 }
 
 

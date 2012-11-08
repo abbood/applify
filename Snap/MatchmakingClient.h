@@ -18,8 +18,22 @@
 
 @end
 
-@interface MatchmakingClient : NSObject <GKSessionDelegate>
+typedef enum
+{
+    ClientStateIdle,
+    ClientStateSearchingForServers,
+    ClientStateConnecting,
+    ClientStateConnected,
+    ClientstateReceiving,
+}
 
+ClientState;
+@interface MatchmakingClient : NSObject <GKSessionDelegate>
+{
+    ClientState _clientState;
+    
+}
+@property (nonatomic)ClientState _clientState;
 @property (nonatomic, strong, readonly) NSArray *availableServers;
 @property (nonatomic, strong, readonly) GKSession *session;
 @property (nonatomic, weak) id <MatchmakingClientDelegate> delegate;

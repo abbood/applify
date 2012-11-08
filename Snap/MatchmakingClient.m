@@ -8,25 +8,17 @@
 
 #import "MatchmakingClient.h"
 
-typedef enum
-{
-	ClientStateIdle,
-	ClientStateSearchingForServers,
-	ClientStateConnecting,
-	ClientStateConnected,
-}
-ClientState;
+
 
 @implementation MatchmakingClient
 {
 	NSMutableArray *_availableServers;
-    ClientState _clientState;
     NSString *_serverPeerID;
 }
 
 @synthesize session = _session;
 @synthesize delegate = _delegate;
-
+@synthesize _clientState;
 - (id)init
 {
 	if ((self = [super init]))
@@ -76,7 +68,7 @@ ClientState;
             // The client has discovered a new server.
 		case GKPeerStateAvailable:
 			if (_clientState == ClientStateSearchingForServers)
-			{		
+			{
 				if (![_availableServers containsObject:peerID])
 				{
 					[_availableServers addObject:peerID];
@@ -106,10 +98,10 @@ ClientState;
         case GKPeerStateConnected:
 			if (_clientState == ClientStateConnecting)
 			{
-				_clientState = ClientStateConnected;
+             	_clientState = ClientStateConnected;
 				[self.delegate matchmakingClient:self didConnectToServer:peerID];
 			}
-			break;
+           	break;
             
             // You're now no longer connected to the server.
 		case GKPeerStateDisconnected:
@@ -121,7 +113,7 @@ ClientState;
             
 		case GKPeerStateConnecting:
 			break;
-	}	
+	}
 }
 
 - (void)session:(GKSession *)session didReceiveConnectionRequestFromPeer:(NSString *)peerID

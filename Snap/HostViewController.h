@@ -24,20 +24,42 @@
 
 @end
 
-@interface HostViewController : UIViewController <UITableViewDataSource, UITableViewDelegate, UITextFieldDelegate, MatchmakingServerDelegate, MPMediaPickerControllerDelegate, MusicTableViewControllerDelegate, AVAudioPlayerDelegate> {
+@interface HostViewController : UIViewController <UITableViewDataSource, UITableViewDelegate, UITextFieldDelegate, MatchmakingServerDelegate, MPMediaPickerControllerDelegate, MusicTableViewControllerDelegate, AVAudioPlayerDelegate,UIAlertViewDelegate> {
     MPMediaItemCollection		*userMediaItemCollection;
   	MPMusicPlayerController		*musicPlayer;
     
 }
 
 @property (nonatomic, weak) id <HostViewControllerDelegate> delegate;
-
-
-
-
-
-@property (nonatomic, retain)	MPMediaItemCollection	*userMediaItemCollection; 
+@property (nonatomic, retain)	MPMediaItemCollection	*userMediaItemCollection;
 @property (readwrite)			BOOL					playedMusicOnce;
 @property (nonatomic, retain)	MPMusicPlayerController	*musicPlayer;
 
+@property (nonatomic,retain)NSArray *listData;
+@property (nonatomic,retain)NSTimer *timer;
+@property (nonatomic,retain)NSMutableArray *cellarray;
+@property (nonatomic,retain)IBOutlet UIButton *Play;
+@property (nonatomic,retain)IBOutlet UIButton *Next;
+@property (nonatomic,retain)IBOutlet UIButton *Pre;
+@property (nonatomic,retain)IBOutlet UIButton *Volume;
+@property (nonatomic,retain)IBOutlet UIImage *SongImage;
+@property (nonatomic,retain)IBOutlet UILabel *SongName;
+@property (nonatomic,retain)IBOutlet UILabel *AlbumName;
+@property (nonatomic,retain)IBOutlet UILabel *SongDuration;
+@property(nonatomic,retain)IBOutlet UIProgressView *ProgressBar;
+
+- (IBAction)startAction:(id)sender;
+- (IBAction)addMusic:(id)sender;
+
++(id)sharedManager;
+-(IBAction)Playtouched:(id)sender;
+-(IBAction)Nexttouched:(id)sender;
+-(IBAction)Pretouched:(id)sender;
+-(IBAction)Volumetouched:(id)sender;
+-(IBAction)Plustouched:(id)sender;
+-(IBAction)Listtouched:(id)sender;
+-(IBAction)Speakertouched:(id)sender;
+-(void)updateProgressBar;
+-(void)pauseProgressBar;
+-(void)changeview;
 @end

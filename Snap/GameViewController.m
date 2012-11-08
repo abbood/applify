@@ -38,7 +38,7 @@
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
 {
-	return UIInterfaceOrientationIsLandscape(interfaceOrientation);
+	return FALSE;
 }
 
 #pragma mark - Actions
@@ -52,16 +52,20 @@
 
 - (void)game:(Game *)game didQuitWithReason:(QuitReason)reason
 {
+    NSLog(@"----------------------------\n");
+    NSLog(@"<%@:%@:%d>", NSStringFromClass([self class]), NSStringFromSelector(_cmd), __LINE__);
 	[self.delegate gameViewController:self didQuitWithReason:reason];
 }
 
 - (void)gameWaitingForServerReady:(Game *)game
-{
+{ NSLog(@"----------------------------\n");
+    NSLog(@"<%@:%@:%d>", NSStringFromClass([self class]), NSStringFromSelector(_cmd), __LINE__);
 	self.centerLabel.text = NSLocalizedString(@"Waiting for game to start...", @"Status text: waiting for server");
 }
 
 - (void)gameWaitingForClientsReady:(Game *)game
-{
+{ NSLog(@"----------------------------\n");
+    NSLog(@"<%@:%@:%d>", NSStringFromClass([self class]), NSStringFromSelector(_cmd), __LINE__);
 	self.centerLabel.text = NSLocalizedString(@"Waiting for other players...", @"Status text: waiting for clients");
 }
 
@@ -78,36 +82,38 @@
 {
 }
 
-- (IBAction)readFromFile:(id)sender 
+- (IBAction)readFromFile:(id)sender
 {
     NSLog(@"we are about to start reading");
-    //streamer = [[AudioStreamer alloc] initWithCFURL:cfURL];    
+    //streamer = [[AudioStreamer alloc] initWithCFURL:cfURL];
     
-
+    
     
     
 }
 
-- (IBAction)writeToFile:(id)sender 
+- (IBAction)writeToFile:(id)sender
 {
-    [self storeDatainFile]; 
+    [self storeDatainFile];
 }
 
 
 -(void)storeDatainFile
 {
+    NSLog(@"----------------------------\n");
+    NSLog(@"<%@:%@:%d>", NSStringFromClass([self class]), NSStringFromSelector(_cmd), __LINE__);
     
-    // init file 
+    // init file
     [self initFile];
     
-    NSURL *assetURL = [NSURL URLWithString:@"ipod-library://item/item.m4a?id=1053020204400037178"]; 
+    NSURL *assetURL = [NSURL URLWithString:@"ipod-library://item/item.m4a?id=1053020204400037178"];
     AVURLAsset *songAsset = [AVURLAsset URLAssetWithURL:assetURL options:nil];
     
     
     NSError * error = nil;
     AVAssetReader* reader = [[AVAssetReader alloc] initWithAsset:songAsset error:&error];
     
-    AVAssetTrack* track = [songAsset.tracks objectAtIndex:0]; 
+    AVAssetTrack* track = [songAsset.tracks objectAtIndex:0];
     
     AVAssetReaderTrackOutput* readerOutput = [AVAssetReaderTrackOutput assetReaderTrackOutputWithTrack:track
                                                                                         outputSettings:nil];
@@ -122,9 +128,9 @@
     NSLog(@"before entering loop.. this is totalPackets filled %lu",totalPacketsFilled);
     shouldExitLoop = false;
     
-    while ((sample = [readerOutput copyNextSampleBuffer]) && !shouldExitLoop) 
-    {                                          
-
+    while ((sample = [readerOutput copyNextSampleBuffer]) && !shouldExitLoop)
+    {
+        
         
         Boolean isBufferDataReady = CMSampleBufferDataIsReady(sample);
         
@@ -134,8 +140,8 @@
             }
         }
         
-        CMBlockBufferRef CMBuffer = CMSampleBufferGetDataBuffer( sample );                                                         
-        AudioBufferList audioBufferList;  
+        CMBlockBufferRef CMBuffer = CMSampleBufferGetDataBuffer( sample );
+        AudioBufferList audioBufferList;
         
         CheckError(CMSampleBufferGetAudioBufferListWithRetainedBlockBuffer(
                                                                            sample,
@@ -153,7 +159,7 @@
         size_t								 packetDescriptionsSizeOut;
         size_t inNumberPackets;
         
-        CheckError(CMSampleBufferGetAudioStreamPacketDescriptionsPtr(sample, 
+        CheckError(CMSampleBufferGetAudioStreamPacketDescriptionsPtr(sample,
                                                                      &inPacketDescriptions,
                                                                      &packetDescriptionsSizeOut),
                    "could not read sample packet descriptions");
@@ -162,14 +168,14 @@
         
         AudioBuffer audioBuffer = audioBufferList.mBuffers[0];
         
-        char * packet = (char*)malloc(MAX_PACKET_SIZE);        
+        char * packet = (char*)malloc(MAX_PACKET_SIZE);
         
         
         for (int i = 0; i < inNumberPackets; ++i)
         {
             
             SInt64 dataOffset = inPacketDescriptions[i].mStartOffset;
-			UInt32 dataSize   = inPacketDescriptions[i].mDataByteSize;            
+			UInt32 dataSize   = inPacketDescriptions[i].mDataByteSize;
             
             size_t packetSpaceRemaining;
             packetSpaceRemaining = MAX_PACKET_SIZE - packetBytesFilled;
@@ -184,13 +190,13 @@
                 [self writeDataToFile:packet];
                 
                 
-                //                [self encapsulateAndShipPacket:packet packetDescriptions:packetDescriptions packetID:assetID];                
+                //                [self encapsulateAndShipPacket:packet packetDescriptions:packetDescriptions packetID:assetID];
             }
             
-       //     NSLog(@"now we are about to copy data to packets");
+            //     NSLog(@"now we are about to copy data to packets");
             // copy data to the packet
-            memcpy((char*)packet + packetBytesFilled, 
-                   (const char*)(audioBuffer.mData + dataOffset), dataSize); 
+            memcpy((char*)packet + packetBytesFilled,
+                   (const char*)(audioBuffer.mData + dataOffset), dataSize);
             
             
             
@@ -204,12 +210,12 @@
             
             
             // if this is the last packet, then ship it
-            if (i == (inNumberPackets - 1)) {          
+            if (i == (inNumberPackets - 1)) {
                 //NSLog(@"woooah! this is the last packet (%d).. so we will ship it!", i);
                 [self writeDataToFile:packet];
-                //  [self encapsulateAndShipPacket:packet packetDescriptions:packetDescriptions packetID:assetID];                 
-            }                  
-        }                                                                                                     
+                //  [self encapsulateAndShipPacket:packet packetDescriptions:packetDescriptions packetID:assetID];
+            }
+        }
     }
     
     NSLog(@"finished going through sample and total packets filled are %lu", totalPacketsFilled);
@@ -220,13 +226,14 @@
 
 -(void)writeDataToFile:(void *)packet
 {
-    
+    NSLog(@"----------------------------\n");
+    NSLog(@"<%@:%@:%d>", NSStringFromClass([self class]), NSStringFromSelector(_cmd), __LINE__);
     UInt32 ioNumPackets = packetsFilled;
     
-   /* NSLog(@"this is packtBody data %@",[NSData dataWithBytes:packet length:packetBytesFilled]);
-    NSLog(@"these are the packet descriptions we will send over");
-    [self printPacketDescriptionContents];
-    NSLog(@"===== we will write %lu bytes with %lu packets", packetBytesFilled, ioNumPackets);*/
+    /* NSLog(@"this is packtBody data %@",[NSData dataWithBytes:packet length:packetBytesFilled]);
+     NSLog(@"these are the packet descriptions we will send over");
+     [self printPacketDescriptionContents];
+     NSLog(@"===== we will write %lu bytes with %lu packets", packetBytesFilled, ioNumPackets);*/
     
     if (totalPacketsFilled >= 10865)
     {
@@ -234,12 +241,12 @@
     }
     
     OSStatus error = AudioFileWritePackets(audioFileID,
-                                     false,
-                                     packetBytesFilled,
-                                     packetDescs, 
-                                     totalPacketsFilled,
-                                     &ioNumPackets,
-                                     packet);    
+                                           false,
+                                           packetBytesFilled,
+                                           packetDescs,
+                                           totalPacketsFilled,
+                                           &ioNumPackets,
+                                           packet);
     if (error != noErr) {
         shouldExitLoop = true;
         return;
@@ -250,7 +257,7 @@
     
     packetsFilled = 0;
     packetBytesFilled = 0;
-    memset(packetDescs, 0, sizeof(packetDescs)); 
+    memset(packetDescs, 0, sizeof(packetDescs));
     
     NSLog(@"written %zu packets with a total of  %lu", ioNumPackets, totalPacketsFilled);
     
@@ -259,7 +266,8 @@
 
 -(void)printPacketDescriptionContents
 {
-    
+    NSLog(@"----------------------------\n");
+    NSLog(@"<%@:%@:%d>", NSStringFromClass([self class]), NSStringFromSelector(_cmd), __LINE__);
     for (int i = 0; i < packetsFilled; ++i)
     {
         NSLog(@"\n----------------\n");
@@ -274,6 +282,8 @@
 
 -(void)initFile
 {
+    NSLog(@"----------------------------\n");
+    NSLog(@"<%@:%@:%d>", NSStringFromClass([self class]), NSStringFromSelector(_cmd), __LINE__);
     cfURL = [self getFilename:@"destinationFile"];
     
     
@@ -289,30 +299,32 @@
     dataFormat.mReserved = 0;
     
     OSStatus audioErr = noErr;
-    audioErr = AudioFileCreateWithURL(cfURL, 
+    audioErr = AudioFileCreateWithURL(cfURL,
                                       kAudioFileMPEG4Type,      //remember, this is file *type*, not audio format, MP4 can handle PCM, AAC, AC3 +
                                       &dataFormat,
-                                      kAudioFileFlags_EraseFile, 
+                                      kAudioFileFlags_EraseFile,
                                       &audioFileID);
     
     
-    assert(audioErr == noErr);    
-    NSLog(@"we havesuccessfully created CFurl");        
+    assert(audioErr == noErr);
+    NSLog(@"we havesuccessfully created CFurl");
 }
 
 
 - (CFURLRef)getFilename:(NSString *)itemID
 {
-    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, 
-                                                         NSUserDomainMask, YES); 
+    NSLog(@"----------------------------\n");
+    NSLog(@"<%@:%@:%d>", NSStringFromClass([self class]), NSStringFromSelector(_cmd), __LINE__);
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory,
+                                                         NSUserDomainMask, YES);
     NSString* docDir = [paths objectAtIndex:0];
-    NSString * slash = [docDir stringByAppendingString:@"/"];                    
+    NSString * slash = [docDir stringByAppendingString:@"/"];
     NSString* file = [slash stringByAppendingString:itemID];
-    NSString* completeFile= [file stringByAppendingString:@".mp4"];    
+    NSString* completeFile= [file stringByAppendingString:@".mp4"];
     
     NSLog(@"destination file name %@", completeFile);
     
-    const char *buffer;    
+    const char *buffer;
     
     buffer = [completeFile UTF8String];
     
@@ -324,16 +336,17 @@
 
 static void CheckError (OSStatus error, const char *operation)
 {
+    
     if (error == noErr) return;
     
     char errorString [20];
     // see if it asppears to be a 4-char code
     *(UInt32 *) (errorString + 1) = CFSwapInt32HostToBig(error);
-    if (isprint(errorString[1]) && isprint (errorString[2]) && 
+    if (isprint(errorString[1]) && isprint (errorString[2]) &&
         isprint(errorString[3]) && isprint (errorString[4])) {
         errorString[0] = errorString[5] = '\'';
         errorString[6] = '\0';
-    } else 
+    } else
         // no format ist as an integer
         sprintf(errorString, "%d", (int)error);
     fprintf(stderr, "error: %s (%s)\n", operation, errorString);

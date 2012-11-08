@@ -74,6 +74,16 @@
 		D717D5CF15D1072D00716465 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D717D5CE15D1072D00716465 /* QuartzCore.framework */; };
 		D717D5EF15D12D8100716465 /* mozart.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = D717D5EE15D12D8100716465 /* mozart.mp3 */; };
 		D718BE6C15EB9FD3004806C3 /* CoreMedia.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D718BE6B15EB9FD3004806C3 /* CoreMedia.framework */; };
+		D719A5AC164BA7A400490583 /* AnimatedGif.m in Sources */ = {isa = PBXBuildFile; fileRef = D719A5AB164BA7A400490583 /* AnimatedGif.m */; };
+		D719A5B1164BA8E700490583 /* ReciverViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D719A5AF164BA8E700490583 /* ReciverViewController.m */; };
+		D719A5B2164BA8E700490583 /* ReciverViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = D719A5B0164BA8E700490583 /* ReciverViewController.xib */; };
+		D719A5B6164BA92E00490583 /* TestTableCell.m in Sources */ = {isa = PBXBuildFile; fileRef = D719A5B4164BA92E00490583 /* TestTableCell.m */; };
+		D719A5B7164BA92E00490583 /* TestTableCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = D719A5B5164BA92E00490583 /* TestTableCell.xib */; };
+		D719A5BB164BA93700490583 /* PlayListTableCell.m in Sources */ = {isa = PBXBuildFile; fileRef = D719A5B9164BA93700490583 /* PlayListTableCell.m */; };
+		D719A5BC164BA93700490583 /* PlayListTableCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = D719A5BA164BA93700490583 /* PlayListTableCell.xib */; };
+		D719A5C0164BA94100490583 /* Simple_PlayerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D719A5BE164BA94100490583 /* Simple_PlayerViewController.m */; };
+		D719A5C1164BA94100490583 /* Simple_PlayerViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = D719A5BF164BA94100490583 /* Simple_PlayerViewController.xib */; };
+		D719A5C3164BA97D00490583 /* loading-spinner.gif in Resources */ = {isa = PBXBuildFile; fileRef = D719A5C2164BA97D00490583 /* loading-spinner.gif */; };
 		D72C642515E8D047004ADD51 /* MusicTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D72C642415E8D047004ADD51 /* MusicTableViewController.m */; };
 		D72C642715E8D62B004ADD51 /* MusicTableView.xib in Resources */ = {isa = PBXBuildFile; fileRef = D72C642615E8D62B004ADD51 /* MusicTableView.xib */; };
 		D72FAB3E15ECD48200919FA9 /* PacketAudioBuffer.m in Sources */ = {isa = PBXBuildFile; fileRef = D72FAB3D15ECD48200919FA9 /* PacketAudioBuffer.m */; };
@@ -187,6 +197,21 @@
 		D717D5CE15D1072D00716465 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		D717D5EE15D12D8100716465 /* mozart.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = mozart.mp3; sourceTree = "<group>"; };
 		D718BE6B15EB9FD3004806C3 /* CoreMedia.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMedia.framework; path = System/Library/Frameworks/CoreMedia.framework; sourceTree = SDKROOT; };
+		D719A5AA164BA7A400490583 /* AnimatedGif.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AnimatedGif.h; sourceTree = "<group>"; };
+		D719A5AB164BA7A400490583 /* AnimatedGif.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AnimatedGif.m; sourceTree = "<group>"; };
+		D719A5AE164BA8E700490583 /* ReciverViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ReciverViewController.h; sourceTree = "<group>"; };
+		D719A5AF164BA8E700490583 /* ReciverViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ReciverViewController.m; sourceTree = "<group>"; };
+		D719A5B0164BA8E700490583 /* ReciverViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ReciverViewController.xib; sourceTree = "<group>"; };
+		D719A5B3164BA92E00490583 /* TestTableCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TestTableCell.h; sourceTree = "<group>"; };
+		D719A5B4164BA92E00490583 /* TestTableCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestTableCell.m; sourceTree = "<group>"; };
+		D719A5B5164BA92E00490583 /* TestTableCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = TestTableCell.xib; sourceTree = "<group>"; };
+		D719A5B8164BA93700490583 /* PlayListTableCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PlayListTableCell.h; sourceTree = "<group>"; };
+		D719A5B9164BA93700490583 /* PlayListTableCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PlayListTableCell.m; sourceTree = "<group>"; };
+		D719A5BA164BA93700490583 /* PlayListTableCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = PlayListTableCell.xib; sourceTree = "<group>"; };
+		D719A5BD164BA94100490583 /* Simple_PlayerViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Simple_PlayerViewController.h; sourceTree = "<group>"; };
+		D719A5BE164BA94100490583 /* Simple_PlayerViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Simple_PlayerViewController.m; sourceTree = "<group>"; };
+		D719A5BF164BA94100490583 /* Simple_PlayerViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = Simple_PlayerViewController.xib; sourceTree = "<group>"; };
+		D719A5C2164BA97D00490583 /* loading-spinner.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = "loading-spinner.gif"; sourceTree = "<group>"; };
 		D72C642315E8D047004ADD51 /* MusicTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MusicTableViewController.h; sourceTree = "<group>"; };
 		D72C642415E8D047004ADD51 /* MusicTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MusicTableViewController.m; sourceTree = "<group>"; };
 		D72C642615E8D62B004ADD51 /* MusicTableView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = MusicTableView.xib; sourceTree = "<group>"; };
@@ -295,6 +320,7 @@
 				7BF49E9814EB9BA100AB8472 /* Button.png */,
 				7BF49E9914EB9BA100AB8472 /* Button@2x.png */,
 				7BF49E9A14EB9BA100AB8472 /* ButtonPressed.png */,
+				D719A5C2164BA97D00490583 /* loading-spinner.gif */,
 				7BF49E9B14EB9BA100AB8472 /* ButtonPressed@2x.png */,
 				7B011470151B2FBA00A0616D /* CellBackground.png */,
 				7B011471151B2FBA00A0616D /* CellBackground@2x.png */,
@@ -392,9 +418,23 @@
 		7BF3E7CF151DF3680091A397 /* View Controllers */ = {
 			isa = PBXGroup;
 			children = (
+				D719A5B3164BA92E00490583 /* TestTableCell.h */,
+				D719A5B4164BA92E00490583 /* TestTableCell.m */,
+				D719A5B5164BA92E00490583 /* TestTableCell.xib */,
+				D719A5BD164BA94100490583 /* Simple_PlayerViewController.h */,
+				D719A5BE164BA94100490583 /* Simple_PlayerViewController.m */,
+				D719A5BF164BA94100490583 /* Simple_PlayerViewController.xib */,
+				D719A5B8164BA93700490583 /* PlayListTableCell.h */,
+				D719A5B9164BA93700490583 /* PlayListTableCell.m */,
+				D719A5BA164BA93700490583 /* PlayListTableCell.xib */,
+				D719A5B0164BA8E700490583 /* ReciverViewController.xib */,
+				D719A5AE164BA8E700490583 /* ReciverViewController.h */,
+				D719A5AF164BA8E700490583 /* ReciverViewController.m */,
 				D72C642615E8D62B004ADD51 /* MusicTableView.xib */,
 				D72C642315E8D047004ADD51 /* MusicTableViewController.h */,
 				D72C642415E8D047004ADD51 /* MusicTableViewController.m */,
+				D719A5AA164BA7A400490583 /* AnimatedGif.h */,
+				D719A5AB164BA7A400490583 /* AnimatedGif.m */,
 				7BF49E2E14E1FCF400AB8472 /* MainViewController.h */,
 				7BF49E2F14E1FCF400AB8472 /* MainViewController.m */,
 				7BF49E3314E1FD3200AB8472 /* MainViewController.xib */,
@@ -592,6 +632,11 @@
 				D717D5EF15D12D8100716465 /* mozart.mp3 in Resources */,
 				D7C487B615DB896D00F4309B /* GameViewController.xib in Resources */,
 				D72C642715E8D62B004ADD51 /* MusicTableView.xib in Resources */,
+				D719A5B2164BA8E700490583 /* ReciverViewController.xib in Resources */,
+				D719A5B7164BA92E00490583 /* TestTableCell.xib in Resources */,
+				D719A5BC164BA93700490583 /* PlayListTableCell.xib in Resources */,
+				D719A5C1164BA94100490583 /* Simple_PlayerViewController.xib in Resources */,
+				D719A5C3164BA97D00490583 /* loading-spinner.gif in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -637,6 +682,11 @@
 				D7A4E6331623F49D00A7D642 /* ServerProfiler.m in Sources */,
 				D7A4E6361623F5BC00A7D642 /* ClientProfiler.m in Sources */,
 				D73BC8511626B8A300F345C0 /* PacketRingBufferGettingFull.m in Sources */,
+				D719A5AC164BA7A400490583 /* AnimatedGif.m in Sources */,
+				D719A5B1164BA8E700490583 /* ReciverViewController.m in Sources */,
+				D719A5B6164BA92E00490583 /* TestTableCell.m in Sources */,
+				D719A5BB164BA93700490583 /* PlayListTableCell.m in Sources */,
+				D719A5C0164BA94100490583 /* Simple_PlayerViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

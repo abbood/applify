@@ -6,6 +6,7 @@
 //  Copyright (c) 2012 Hollance. All rights reserved.
 //
 
+
 #import "Game.h"
 
 #include <AudioToolbox/AudioToolbox.h>
@@ -13,6 +14,7 @@
 #include <CoreAudio/CoreAudioTypes.h>
 
 @class GameViewController;
+@class Game;
 
 @protocol GameViewControllerDelegate <NSObject>
 
@@ -20,11 +22,13 @@
 
 @end
 
+
+
 @interface GameViewController : UIViewController <UIAlertViewDelegate, GameDelegate>
 {
     CFURLRef cfURL;
     AudioFileID audioFileID;
-    AudioStreamBasicDescription dataFormat;     
+    AudioStreamBasicDescription dataFormat;
     UInt32 packetBytesFilled;
     AudioStreamPacketDescription packetDescs[kAQMaxPacketDescs];	// packet descriptions for enqueuing audio
     size_t packetsFilled;			// how many packets have been filled (in one copy run)
@@ -32,7 +36,7 @@
     
    	AudioStreamer *streamer;
     Boolean shouldExitLoop;
-
+    
 }
 
 @property (nonatomic, weak) id <GameViewControllerDelegate> delegate;

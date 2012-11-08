@@ -7,7 +7,7 @@
 //
 
 #import "MatchmakingServer.h"
-
+#import "Packet.h"
 typedef enum
 {
 	ServerStateIdle,
@@ -25,6 +25,7 @@ ServerState;
 @synthesize maxClients = _maxClients;
 @synthesize session = _session;
 @synthesize delegate = _delegate;
+@synthesize PeerId;
 
 - (id)init
 {
@@ -53,6 +54,19 @@ ServerState;
 	return _connectedClients;
 }
 
+- (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
+
+{
+    NSLog(@"PeerId %@",self.PeerId);
+    NSString *title = [alertView buttonTitleAtIndex:buttonIndex];
+    if([title isEqualToString:@"NO"])
+    {
+        [_connectedClients addObject:self.PeerId];
+        [self.delegate matchmakingServer:self clientDidConnect:self.PeerId];
+    }
+    
+}
+
 #pragma mark - GKSessionDelegate
 
 - (void)session:(GKSession *)session peer:(NSString *)peerID didChangeState:(GKPeerConnectionState)state
@@ -75,8 +89,19 @@ ServerState;
 			{
 				if (![_connectedClients containsObject:peerID])
 				{
-					[_connectedClients addObject:peerID];
-					[self.delegate matchmakingServer:self clientDidConnect:peerID];
+                    NSString *peerID2 =[self displayNameForPeerID:peerID];
+                    self.PeerId=peerID;
+                    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Oops:("
+                                                                    message:[NSString stringWithFormat:@"%@:%@ %@",@"device",peerID2,@"want to join your session"]
+                                                                   delegate:self
+                                                          cancelButtonTitle:@"NO"
+                                                          otherButtonTitles:nil];
+                    
+                    [alert show];
+                    //					[_connectedClients addObject:peerID];
+                    //                    NSLog(@"the orginal peerID %@",peerID);
+                    //					[self.delegate matchmakingServer:self clientDidConnect:peerID];
+                    
 				}
 			}
 			break;

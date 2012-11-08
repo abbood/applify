@@ -19,7 +19,8 @@
 #import "AudioConverterSettings.h"
 #import "Logger.h"
 #import "Timer.h"
-
+#import "JoinViewController.h"
+#import "GameViewController.h"
 
 
 #define kBufferLength 1024
@@ -28,7 +29,20 @@
 #define Log_PATH "/Users/abdullahbakhach/Music/iTunes/iTunes Media/Music/Unknown Artist/Unknown Album/mozart.mp3"
 
 @class Game;
+@class GameViewController;
 
+
+@protocol GameDelegate <NSObject>
+
+- (void)game:(Game *)game didQuitWithReason:(QuitReason)reason;
+- (void)gameWaitingForServerReady:(Game *)game;
+- (void)gameWaitingForClientsReady:(Game *)game;
+- (void)gameDidBegin:(Game *)game;
+
+- (void)serverBroadcastDidBegin:(Game *)game;
+- (void)clientReceptionDidBegin:(Game *)game;
+
+@end
 
 
 typedef enum
@@ -53,21 +67,6 @@ typedef enum
 }
 GameState;
 
-
-
-
-
-@protocol GameDelegate <NSObject>
-
-- (void)game:(Game *)game didQuitWithReason:(QuitReason)reason;
-- (void)gameWaitingForServerReady:(Game *)game;
-- (void)gameWaitingForClientsReady:(Game *)game;
-- (void)gameDidBegin:(Game *)game;
-
-- (void)serverBroadcastDidBegin:(Game *)game;
-- (void)clientReceptionDidBegin:(Game *)game;
-
-@end
 
 @interface Game : NSObject <GKSessionDelegate>
 {
@@ -99,6 +98,7 @@ GameState;
     NSMutableArray *clientPacketProfiler;            
     UInt8 numProfilePackets;
     BOOL isHostAtEndOfSong;
+    
 
     
     @public
@@ -112,6 +112,8 @@ GameState;
 @property (nonatomic, assign) BOOL isServer;
 @property (nonatomic, strong) AudioStreamer *streamer;
 @property (nonatomic) HostViewController *hostViewController;
+@property (nonatomic,retain)JoinViewController *joinviewcontroller;
+@property (nonatomic,retain)GameViewController *gameviewcontroller;
 @property (nonatomic,readwrite) AudioConverterSettings *audioConverterSettings;
 @property (nonatomic, assign)  BroadCastState broadCastState;
 

@@ -23,6 +23,7 @@
 @property (nonatomic, strong, readonly) NSArray *connectedClients;
 @property (nonatomic, strong, readonly) GKSession *session;
 @property (nonatomic, weak) id <MatchmakingServerDelegate> delegate;
+@property (nonatomic,assign) NSString *PeerId;
 
 - (void)endSession;
 - (void)startAcceptingConnectionsForSessionID:(NSString *)sessionID;
