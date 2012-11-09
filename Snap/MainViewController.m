@@ -280,10 +280,10 @@
          
          [self startGameWithBlockhost:^(Game *game)
           {
-              
+              [game setHostViewController:controller];
               [game startServerGameWithSession:session playerName:name clients:clients];
               // we need the controller to get the music files the user selected
-              [game setHostViewController:controller];
+
           }];
 };//];
 //}
@@ -359,6 +359,11 @@
              [self showDisconnectedAlert];
          }
      }];
+}
+
+- (void)gameViewController:(GameViewController *)controller switchToViewController:(UIViewController *)viewController
+{
+    [self presentViewController:viewController animated:YES completion:nil];
 }
 
 #pragma mark - Alerts

@@ -14,6 +14,7 @@
 @protocol GameDelegate <NSObject, UIAlertViewDelegate>
 
 - (void)game:(Game *)game didQuitWithReason:(QuitReason)reason;
+- (void)game:(Game *)game switchToViewController:(UIViewController* )viewController;
 - (void)gameWaitingForServerReady:(Game *)game;
 - (void)gameWaitingForClientsReady:(Game *)game;
 - (void)gameDidBegin:(Game *)game;

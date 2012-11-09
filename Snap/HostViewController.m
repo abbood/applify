@@ -123,7 +123,6 @@
 	{
         // only when the game starts we stop accepting connections
         [_matchmakingServer stopAcceptingConnections];
-        _game._state = GameStateWaitingForSignIn;
         NSLog(@"SERVER: sending sign in request");
         Packet *packet = [Packet packetWithType:PacketTypeSignInRequest];
         [_game sendPacketToAllClients:packet];

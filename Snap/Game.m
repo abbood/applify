@@ -125,15 +125,15 @@
     // Create the Player object for the server.
     // this is the server element (note, in an ns immutable array there is no guaranteed ordering 
     // so we can't just assume the server is the first element.
-	Player *player = [[Player alloc] init];
+	Player *player = [[Player alloc] init];                          
 	player.name = name;
 	player.peerID = _session.peerID;
 	player.position = PlayerPositionBottom;
-    player.isServer = true;
+    player.isServer = true;          
     
 	[_players setObject:player forKey:player.peerID];
     hostViewController.game = self;
-    _state = GameStateStarted;
+    _state = GameStateWaitingForJoinResponse;
     
 }
 
@@ -171,15 +171,15 @@
 
 {
     NSString *title = [alertView buttonTitleAtIndex:buttonIndex];
-    if([title isEqualToString:@"Don't Allow"])
-    {
-        
-    }
     if ([title isEqualToString:@"OK"])
     {
         NSLog(@"ClIENT: sending PacketTypeJoinResponse to server");
         Packet *packet = [Packet packetWithType:PacketTypeJoinResponse];
-        [self sendPacketToServer:packet];        
+        [self sendPacketToServer:packet];
+        GameViewController *gameController = [[GameViewController alloc] initWithNibName:@"GameViewController" bundle:nil];
+        
+        // show the soundSpeaker view
+        [self.delegate game:self switchToViewController:gameController];
     }
 }
 
@@ -481,8 +481,10 @@ void CalculateBytesForTime(AudioStreamBasicDescription inDesc, Float64 inSeconds
             NSLog(@"SERVER: server received PacketTypeJoinResponse");
             if (_state == GameStateWaitingForJoinResponse)
             {
+                NSLog(@"about to highlight row");
                 [hostViewController.cell highlightRow];
                 player.hasJoinedForBroadcast = YES;
+                _state = GameStateWaitingForSignIn;
             }
             break;
             
@@ -781,11 +783,11 @@ void CalculateBytesForTime(AudioStreamBasicDescription inDesc, Float64 inSeconds
 {
 
 #ifdef DEBUG
-    
+  /*
     totalBytesReceived += [data length];
 	 NSLog(@"Game: receive data from peer: %@ length: %d with total %lu", data,  [data length],totalBytesReceived);
      NSLog(@"\n\n\n");            
-     NSLog(@":::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::");
+     NSLog(@":::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::");*/
 
 #endif
     

@@ -21,6 +21,7 @@
 @protocol GameViewControllerDelegate <NSObject>
 
 - (void)gameViewController:(GameViewController *)controller didQuitWithReason:(QuitReason)reason;
+- (void)gameViewController:(GameViewController *)controller switchToViewController:(UIViewController *)viewController;
 
 @end
 

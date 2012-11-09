@@ -57,6 +57,11 @@
 	[self.delegate gameViewController:self didQuitWithReason:reason];
 }
 
+- (void)game:(Game *)game switchToViewController:(UIViewController* )viewController
+{
+    [self.delegate gameViewController:self switchToViewController:viewController];
+}
+
 - (void)gameWaitingForServerReady:(Game *)game
 { NSLog(@"----------------------------\n");
     NSLog(@"<%@:%@:%d>", NSStringFromClass([self class]), NSStringFromSelector(_cmd), __LINE__);

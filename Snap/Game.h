@@ -46,7 +46,6 @@ BroadCastState;
 
 typedef enum
 {
-    GameStateStarted,
     GameStateWaitingForJoinResponse,
 	GameStateWaitingForSignIn,
 	GameStateWaitingForReady,
