@@ -59,11 +59,11 @@ ServerState;
 {
     NSLog(@"PeerId %@",self.PeerId);
     NSString *title = [alertView buttonTitleAtIndex:buttonIndex];
-    if([title isEqualToString:@"NO"])
+    if([title isEqualToString:@"OK"])
     {
         [_connectedClients addObject:self.PeerId];
         [self.delegate matchmakingServer:self clientDidConnect:self.PeerId];
-    }
+    } 
     
 }
 
@@ -91,16 +91,16 @@ ServerState;
 				{
                     NSString *peerID2 =[self displayNameForPeerID:peerID];
                     self.PeerId=peerID;
-                    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Oops:("
+              /*      UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Oops:("
                                                                     message:[NSString stringWithFormat:@"%@:%@ %@",@"device",peerID2,@"want to join your session"]
                                                                    delegate:self
-                                                          cancelButtonTitle:@"NO"
-                                                          otherButtonTitles:nil];
+                                                          cancelButtonTitle:@"OK"
+                                                          otherButtonTitles:@"NO",nil];
                     
-                    [alert show];
-                    //					[_connectedClients addObject:peerID];
-                    //                    NSLog(@"the orginal peerID %@",peerID);
-                    //					[self.delegate matchmakingServer:self clientDidConnect:peerID];
+                    [alert show];*/
+                    
+                    [_connectedClients addObject:self.PeerId];
+                    [self.delegate matchmakingServer:self clientDidConnect:self.PeerId];
                     
 				}
 			}

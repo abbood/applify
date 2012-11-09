@@ -81,7 +81,9 @@
     
     [self setupApplicationAudio];
     
-    UITapGestureRecognizer *gestureRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self.nameTextField action:@selector(resignFirstResponder)];
+    UITapGestureRecognizer *gestureRecognizer = [[UITapGestureRecognizer alloc]
+                                                    initWithTarget:self.nameTextField
+                                                            action:@selector(resignFirstResponder)];
 	gestureRecognizer.cancelsTouchesInView = NO;
 	[self.view addGestureRecognizer:gestureRecognizer];
 }
@@ -351,10 +353,7 @@
 	[tableView deselectRowAtIndexPath:indexPath animated:YES];
     NSString *peerID2 = [_matchmakingServer peerIDForConnectedClientAtIndex:indexPath.row];
     NSLog(@"PeerID2 :%@",peerID2);
-    //    Packet *packet=[[Packet alloc]initWithType:PacketTypeChangeView];
-    //
-    //    Game *game=[[Game alloc]init];
-    //    [game sendPacketToClient:packet peerID:peerID2];
+
     NSError *error;
     Packet *packet = [Packet packetWithType:PacketTypeChangeView];
     NSData *data = [packet data];

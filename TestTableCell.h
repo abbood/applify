@@ -16,14 +16,17 @@
 {
     UIButton *Speaker;
     UILabel *PhoneName;
+    UILabel *Pending;
     int *row;
 
     
-    MatchmakingClient *_matchmakingClient;;
+    MatchmakingClient *_matchmakingClient;
     
 }
 @property (nonatomic,retain)IBOutlet UIButton *Speaker;
 @property (nonatomic,retain)IBOutlet UILabel *PhoneName;
+@property (nonatomic,retain)IBOutlet UILabel *Pending;
+
 @property (nonatomic)int *row;
 
 

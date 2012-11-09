@@ -347,6 +347,10 @@
         }
         
         cell.row=(int*)indexPath.row;
+        [cell.Speaker setHidden:YES];
+        [cell.Pending setHidden:NO];
+        cell.userInteractionEnabled = NO;
+
         NSString *peerID = [_matchmakingClient peerIDForAvailableServerAtIndex:indexPath.row];
         cell.PhoneName.text = [_matchmakingClient displayNameForPeerID:peerID];
         
@@ -377,11 +381,11 @@
 
 #pragma mark - UITableViewDelegate
 
-- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+/*- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
 	[tableView deselectRowAtIndexPath:indexPath animated:YES];
     
-	if (_matchmakingClient != nil)
+	/*if (_matchmakingClient != nil)
 	{
 		NSString *peerID = [_matchmakingClient peerIDForAvailableServerAtIndex:indexPath.row];
 		[_matchmakingClient connectToServerWithPeerID:peerID];
@@ -391,7 +395,7 @@
         
 	}
 }
-
+*/
 #pragma mark - UITextFieldDelegate
 
 - (BOOL)textFieldShouldReturn:(UITextField *)textField
@@ -460,7 +464,7 @@ int fserverCount=0;
             //hide spinner
             [spinner setHidden:YES];
             //alert view error message
-            alert = [[UIAlertView alloc] initWithTitle:@"Oops:("
+            alert = [[UIAlertView alloc] initWithTitle:nil
                                                message:@"No device found \n Make sure bluetooth is activated and the devices are within range."
                                               delegate:self
                                      cancelButtonTitle:@"Tap to retry"
