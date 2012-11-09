@@ -32,4 +32,5 @@
 
 -(IBAction)SpeakerTouched:(id)sender;
 - (id)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier tag:(NSInteger)tag;
+-(void)highlightRow;
 @end

@@ -11,7 +11,7 @@
 
 @class Game;
 
-@protocol GameDelegate <NSObject>
+@protocol GameDelegate <NSObject, UIAlertViewDelegate>
 
 - (void)game:(Game *)game didQuitWithReason:(QuitReason)reason;
 - (void)gameWaitingForServerReady:(Game *)game;

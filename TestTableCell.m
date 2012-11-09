@@ -90,4 +90,18 @@
 //            }
 
 }
+
+-(void)highlightRow
+{
+    [Speaker setImage:[UIImage imageNamed:@"speakers states3.png"]forState:UIControlStateSelected];
+    [Speaker setSelected:YES];
+    UIImage *myGradient = [UIImage imageNamed:@"Gradient.png"];
+    self.PhoneName.textColor   = [UIColor colorWithPatternImage:myGradient];
+    JoinViewController *table=[[JoinViewController alloc]init ];
+       
+    [table.cellarray replaceObjectAtIndex:self.row withObject:@"c"] ;
+    
+      
+    
+}
 @end

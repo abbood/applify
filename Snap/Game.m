@@ -113,7 +113,8 @@
 	self.isServer = YES;
     
 	_session = session;
-	_session.available = NO;
+    // we are still available.. b/c clients can still connect
+//	_session.available = NO;
 	_session.delegate = self;
 	[_session setDataReceiveHandler:self withContext:nil];
     
@@ -129,33 +130,10 @@
 	player.peerID = _session.peerID;
 	player.position = PlayerPositionBottom;
     player.isServer = true;
-    // initialize the packet profiler for the server (same amount as queue buffers)
-    //player.packetProfiler = [NSMutableArray arrayWithCapacity:kNumAQBufs];
-    player.packetProfiler = [[ServerProfiler alloc] initWithClients:[clients count]];
     
 	[_players setObject:player forKey:player.peerID];
-    
-	// Add a Player object for each client.
-	int index = 0;
-	for (NSString *peerID in clients)
-	{
-		Player *player = [[Player alloc] init];
-		player.peerID = peerID;
-		[_players setObject:player forKey:player.peerID];
-        
-		if (index == 0)
-			player.position = ([clients count] == 1) ? PlayerPositionTop : PlayerPositionLeft;
-		else if (index == 1)
-			player.position = PlayerPositionTop;
-		else
-			player.position = PlayerPositionRight;
-        
-		index++;
-	}
-    
-    NSLog(@"SERVER: sending sign in request");
-    Packet *packet = [Packet packetWithType:PacketTypeSignInRequest];
-	[self sendPacketToAllClients:packet];
+    hostViewController.game = self;
+    _state = GameStateStarted;
     
 }
 
@@ -189,7 +167,21 @@
     
 	[self.delegate game:self didQuitWithReason:reason];
 }
+- (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
 
+{
+    NSString *title = [alertView buttonTitleAtIndex:buttonIndex];
+    if([title isEqualToString:@"Don't Allow"])
+    {
+        
+    }
+    if ([title isEqualToString:@"OK"])
+    {
+        NSLog(@"ClIENT: sending PacketTypeJoinResponse to server");
+        Packet *packet = [Packet packetWithType:PacketTypeJoinResponse];
+        [self sendPacketToServer:packet];        
+    }
+}
 
 - (void)clientReceivedPacket:(Packet *)packet
 {
@@ -198,13 +190,20 @@
 	switch (recievedPacket.packetType)
 	{
             
-        case PacketTypeChangeView:
+        case PacketTypeJoinRequest:
         {
-            NSLog(@"CLIENT: we just recieved a chagne view packet");
+            UIAlertView *alertView = [[UIAlertView alloc]
+                                      initWithTitle:@"Applify"
+                                      message:@"Would like to connect to your speaker"
+                                      delegate:self
+                                      cancelButtonTitle:@"Don't Allow"
+                                      otherButtonTitles:@"OK",nil];
             
-            // will be used later for further processing
+            [alertView show];
+            
+            
         }
-            
+        break;
             
 		case PacketTypeSignInRequest:
         {
@@ -478,6 +477,15 @@ void CalculateBytesForTime(AudioStreamBasicDescription inDesc, Float64 inSeconds
     [Logger Log:@"we are inside serverReceivedPacket"];
 	switch (packet.packetType)
 	{       
+        case PacketTypeJoinResponse:
+            NSLog(@"SERVER: server received PacketTypeJoinResponse");
+            if (_state == GameStateWaitingForJoinResponse)
+            {
+                [hostViewController.cell highlightRow];
+                player.hasJoinedForBroadcast = YES;
+            }
+            break;
+            
             
 		case PacketTypeSignInResponse:
             NSLog(@"SERVER: server received PacketTypeSignInResponse");
@@ -774,10 +782,10 @@ void CalculateBytesForTime(AudioStreamBasicDescription inDesc, Float64 inSeconds
 
 #ifdef DEBUG
     
-    /*totalBytesReceived += [data length];
+    totalBytesReceived += [data length];
 	 NSLog(@"Game: receive data from peer: %@ length: %d with total %lu", data,  [data length],totalBytesReceived);
      NSLog(@"\n\n\n");            
-    NSLog(@":::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::");*/
+     NSLog(@":::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::");
 
 #endif
     
@@ -793,7 +801,11 @@ void CalculateBytesForTime(AudioStreamBasicDescription inDesc, Float64 inSeconds
     if (player != nil)
 	{
 		player.receivedResponse = YES;  // this is the new bit
-	}    
+	} else {
+        Player *player = [[Player alloc] init];
+		player.peerID = peerID;
+		[_players setObject:player forKey:player.peerID];
+    }
     
 	if (self.isServer)
     {

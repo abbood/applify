@@ -43,6 +43,8 @@
 @synthesize startButton = _startButton;
 @synthesize broadcastMusicButton = _broadcastMusicButton;
 @synthesize delegate = _delegate;
+@synthesize cell = _cell;
+@synthesize game = _game;
 
 @synthesize userMediaItemCollection;
 @synthesize playedMusicOnce;			// A flag indicating if the user has played iPod library music at least one time
@@ -119,22 +121,20 @@
     NSLog(@"<%@:%@:%d>", NSStringFromClass([self class]), NSStringFromSelector(_cmd), __LINE__);
 	if (_matchmakingServer != nil && [_matchmakingServer connectedClientCount] > 0)
 	{
-		NSString *name = [self.nameTextField.text stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
-		if ([name length] == 0)
-			name = _matchmakingServer.session.displayName;
-        
-		[_matchmakingServer stopAcceptingConnections];
-        
-		[self.delegate hostViewController:self
-                     startGameWithSession:_matchmakingServer.session
-                               playerName:name
-                                  clients:_matchmakingServer.connectedClients
-         ];
+        // only when the game starts we stop accepting connections
+        [_matchmakingServer stopAcceptingConnections];
+        _game._state = GameStateWaitingForSignIn;
+        NSLog(@"SERVER: sending sign in request");
+        Packet *packet = [Packet packetWithType:PacketTypeSignInRequest];
+        [_game sendPacketToAllClients:packet];
 	}
 }
 
 
+-(void)handleClientJoin
+{
 
+}
 
 
 
@@ -298,11 +298,11 @@
 {
     
     
-    TestTableCell *cell=[tableView dequeueReusableCellWithIdentifier:[NSString stringWithFormat:@"%d",indexPath.row]];
+    _cell=[tableView dequeueReusableCellWithIdentifier:[NSString stringWithFormat:@"%d",indexPath.row]];
     
-    if (cell==nil)
+    if (_cell==nil)
     {
-        cell = [[TestTableCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:[NSString stringWithFormat:@"%d",indexPath.row]];
+        _cell = [[TestTableCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:[NSString stringWithFormat:@"%d",indexPath.row]];
         
         NSArray* views = [[NSBundle mainBundle] loadNibNamed:@"TestTableCell" owner:nil options:nil];
         
@@ -310,35 +310,35 @@
         {
             if([view isKindOfClass:[TestTableCell class]])
             {
-                cell = (TestTableCell*)view;
+                _cell = (TestTableCell*)view;
             }
         }
         
-        cell.row=(int*)indexPath.row;
+        _cell.row=(int*)indexPath.row;
         NSString *peerID = [_matchmakingServer peerIDForConnectedClientAtIndex:indexPath.row];
-        cell.PhoneName.text =  [_matchmakingServer displayNameForPeerID:peerID];
+        _cell.PhoneName.text =  [_matchmakingServer displayNameForPeerID:peerID];
         
         
         if ([self.cellarray objectAtIndex:indexPath.row ]!= @"c")
         {
             
-            [cell.Speaker setImage:[UIImage imageNamed:@"speakers states2.png"] forState:UIControlStateNormal];
+            [_cell.Speaker setImage:[UIImage imageNamed:@"speakers states2.png"] forState:UIControlStateNormal];
             
         }
         
         else
         {
-            [cell.Speaker setSelected:YES];
+            [_cell.Speaker setSelected:YES];
             UIImage *myGradient = [UIImage imageNamed:@"Gradient.png"];
-            cell.PhoneName.textColor = [UIColor colorWithPatternImage:myGradient];
-            [cell.Speaker setImage:[UIImage imageNamed:@"speakers states3.png"] forState:UIControlStateSelected];
+            _cell.PhoneName.textColor = [UIColor colorWithPatternImage:myGradient];
+            [_cell.Speaker setImage:[UIImage imageNamed:@"speakers states3.png"] forState:UIControlStateSelected];
             
         }
         
     }
     ProgressBar.progress+=0.001;
     
-    return  cell;
+    return  _cell;
 }
 
 #pragma mark - UITableViewDelegate
@@ -354,8 +354,26 @@
     NSString *peerID2 = [_matchmakingServer peerIDForConnectedClientAtIndex:indexPath.row];
     NSLog(@"PeerID2 :%@",peerID2);
 
+    
+    if (!_game) {
+        // game starts here.. otherwise we won't be able to handle communication from clients
+        // ie we need to set the GKSession data handler..
+            
+        NSLog(@"create game obj");
+        NSString *name = [self.nameTextField.text stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+        if ([name length] == 0)
+            name = _matchmakingServer.session.displayName;
+            
+        [self.delegate hostViewController:self
+                     startGameWithSession:_matchmakingServer.session
+                               playerName:name
+                                  clients:_matchmakingServer.connectedClients
+         ];
+    }
+    
+    NSLog(@"SERVER sending PacketTypeJoinRequest");
     NSError *error;
-    Packet *packet = [Packet packetWithType:PacketTypeChangeView];
+    Packet *packet = [Packet packetWithType:PacketTypeJoinRequest];
     NSData *data = [packet data];
     if (![_matchmakingServer.session sendData:data
                                       toPeers:[NSArray arrayWithObject:peerID2]

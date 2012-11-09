@@ -11,8 +11,11 @@
 #import <AVFoundation/AVFoundation.h>
 #import "MatchmakingServer.h"
 #import "MusicTableViewController.h"
+#import "TestTableCell.h"
+#import "Game.h"
 
 @class HostViewController;
+@class Game;
 
 @protocol HostViewControllerDelegate <NSObject>
 
@@ -47,6 +50,8 @@
 @property (nonatomic,retain)IBOutlet UILabel *AlbumName;
 @property (nonatomic,retain)IBOutlet UILabel *SongDuration;
 @property(nonatomic,retain)IBOutlet UIProgressView *ProgressBar;
+@property (nonatomic, strong)TestTableCell *cell;
+@property (nonatomic, strong)Game *game;
 
 - (IBAction)startAction:(id)sender;
 - (IBAction)addMusic:(id)sender;

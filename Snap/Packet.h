@@ -36,7 +36,8 @@ typedef enum
 	PacketTypeClientQuit,              // client to server
     PacketTypeEndOfSong,
     
-    PacketTypeChangeView,
+    PacketTypeJoinRequest,             // server to client
+    PacketTypeJoinResponse             // client to server
     
 }
 PacketType;

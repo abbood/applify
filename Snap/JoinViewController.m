@@ -67,7 +67,24 @@
 @synthesize SongDuration;
 @synthesize ProgressBar;
 
++(id)sharedManager
+{
+    
+    static JoinViewController *sharedclass1=nil;
+    if (!sharedclass1)
+    {
+        sharedclass1=[[super allocWithZone:nil]init];
+        sharedclass1.cellarray=[[NSMutableArray alloc]init];
+        
+    }
+    return sharedclass1;
+    
+}
 
++(id)allocWithZone:(NSZone *)zone
+{
+    return [self sharedManager];
+}
 
 -(IBAction)Playtouched:(id)sender
 {

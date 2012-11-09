@@ -21,6 +21,7 @@
 #import "Timer.h"
 #import "JoinViewController.h"
 #import "GameViewController.h"
+#import "GameDelegate.h"
 
 
 #define kBufferLength 1024
@@ -30,19 +31,8 @@
 
 @class Game;
 @class GameViewController;
+@class HostViewController;
 
-
-@protocol GameDelegate <NSObject>
-
-- (void)game:(Game *)game didQuitWithReason:(QuitReason)reason;
-- (void)gameWaitingForServerReady:(Game *)game;
-- (void)gameWaitingForClientsReady:(Game *)game;
-- (void)gameDidBegin:(Game *)game;
-
-- (void)serverBroadcastDidBegin:(Game *)game;
-- (void)clientReceptionDidBegin:(Game *)game;
-
-@end
 
 
 typedef enum
@@ -56,6 +46,8 @@ BroadCastState;
 
 typedef enum
 {
+    GameStateStarted,
+    GameStateWaitingForJoinResponse,
 	GameStateWaitingForSignIn,
 	GameStateWaitingForReady,
     GameStateWaitingForPrimed,
@@ -116,6 +108,7 @@ GameState;
 @property (nonatomic,retain)GameViewController *gameviewcontroller;
 @property (nonatomic,readwrite) AudioConverterSettings *audioConverterSettings;
 @property (nonatomic, assign)  BroadCastState broadCastState;
+@property (nonatomic, assign) GameState _state;
 
 
 
@@ -145,6 +138,7 @@ GameState;
 - (void)sendPacketToServer:(Packet *)packet;
 -(void)startPlaying:(MPMusicPlayerController *)player;
 - (void)sendPacketToServerUnreliable:(Packet *)packet;
+- (void)sendPacketToAllClients:(Packet *)packet;
 
 
 

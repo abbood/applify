@@ -14,6 +14,7 @@
 @synthesize name = _name;
 @synthesize peerID = _peerID;
 @synthesize isServer = _isServer;
+@synthesize hasJoinedForBroadcast = _hasJoinedForBroadcast;
 
 @synthesize receivedResponse = _receivedResponse;
 @synthesize isPrimed = _isPrimed;

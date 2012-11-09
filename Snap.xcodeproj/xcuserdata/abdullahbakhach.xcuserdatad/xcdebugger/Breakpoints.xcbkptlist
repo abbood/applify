@@ -4,15 +4,15 @@
    version = "1.0">
    <FileBreakpoints>
       <FileBreakpoint
-         shouldBeEnabled = "Yes"
+         shouldBeEnabled = "No"
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "Snap/Game.m"
-         timestampString = "374142103.009019"
+         timestampString = "374157731.268649"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "203"
-         endingLineNumber = "203"
+         startingLineNumber = "195"
+         endingLineNumber = "195"
          landmarkName = "-clientReceivedPacket:"
          landmarkType = "5">
       </FileBreakpoint>
@@ -20,26 +20,26 @@
          shouldBeEnabled = "Yes"
          ignoreCount = "0"
          continueAfterRunningActions = "No"
-         filePath = "Snap/MatchmakingClient.m"
-         timestampString = "374142123.411126"
+         filePath = "Snap/Game.m"
+         timestampString = "374157731.268649"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "66"
-         endingLineNumber = "66"
-         landmarkName = "-session:peer:didChangeState:"
+         startingLineNumber = "482"
+         endingLineNumber = "482"
+         landmarkName = "-serverReceivedPacket:fromPlayer:"
          landmarkType = "5">
       </FileBreakpoint>
       <FileBreakpoint
-         shouldBeEnabled = "Yes"
+         shouldBeEnabled = "No"
          ignoreCount = "0"
          continueAfterRunningActions = "No"
-         filePath = "Snap/MatchmakingClient.m"
-         timestampString = "374142464.232925"
+         filePath = "Snap/HostViewController.m"
+         timestampString = "374157692.70423"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "51"
-         endingLineNumber = "51"
-         landmarkName = "-connectToServerWithPeerID:"
+         startingLineNumber = "362"
+         endingLineNumber = "362"
+         landmarkName = "-tableView:didSelectRowAtIndexPath:"
          landmarkType = "5">
       </FileBreakpoint>
    </FileBreakpoints>

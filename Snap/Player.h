@@ -25,6 +25,7 @@ PlayerPosition;
 @property (nonatomic, assign) BOOL receivedResponse;
 @property (nonatomic, assign) BOOL isPrimed;
 @property (nonatomic, assign) BOOL isServer;
+@property (nonatomic, assign) BOOL hasJoinedForBroadcast;
 
 @property (nonatomic, assign) double packetDelayAvg;
 @property (nonatomic, assign) double packetDelayMax;
