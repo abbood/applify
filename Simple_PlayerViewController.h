@@ -10,6 +10,11 @@
 
 #import <UIKit/UIKit.h>
 #import <MediaPlayer/MediaPlayer.h>
+@protocol Simple_PlayerViewControllerDelegate <NSObject>
+
+
+
+@end
 
 @interface Simple_PlayerViewController : UIViewController <MPMediaPickerControllerDelegate, UITableViewDelegate, UITableViewDataSource,UISearchDisplayDelegate,UISearchBarDelegate> {
     UITextField *titleSearch;
@@ -59,7 +64,7 @@
 @property (nonatomic) NSInteger savedScopeButtonIndex;
 @property (nonatomic) BOOL searchWasActive;
 @property (nonatomic)BOOL collectionModified;
-@property (nonatomic, weak) id <SimpleViewController> delegate;
+@property (nonatomic, weak) id <Simple_PlayerViewControllerDelegate> delegate;
 
 
 

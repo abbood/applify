@@ -515,6 +515,7 @@ int fserverCount=0;
         
         HostViewController *host=[[HostViewController alloc]initWithNibName:@"HostViewController" bundle:nil];
         host.delegate=self.mainview;
+        host.mainview=self.mainview;
         [self presentViewController:host animated:YES completion:nil];
     }
 }

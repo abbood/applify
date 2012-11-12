@@ -270,9 +270,9 @@
     Simple_PlayerViewController *simple_playlistViewController = [[Simple_PlayerViewController alloc]
                                                                   initWithNibName:@"Simple_PlayerViewController"
                                                                   bundle:nil];
-     simple_playlistViewController.delegate = self;
+  
     
-    [self presentViewController:simple_playlistViewController animated:NO completion:nil];
+    [[self navigationController] pushViewController:simple_playlistViewController animated:NO];
 }
 
 

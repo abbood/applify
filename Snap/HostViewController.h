@@ -53,7 +53,7 @@
 @property(nonatomic,retain)IBOutlet UIProgressView *ProgressBar;
 @property (nonatomic, strong)TestTableCell *cell;
 @property (nonatomic, strong)Game *game;
-
+@property (nonatomic,retain)MainViewController *mainview;
 - (IBAction)startAction:(id)sender;
 - (IBAction)addMusic:(id)sender;
 - (IBAction)changeView_playList:(id)sender;

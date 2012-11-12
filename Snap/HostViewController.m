@@ -133,7 +133,10 @@
 
 - (IBAction)changeView_playList:(id)sender
 {
-    [self.delegate changeView_playList:self];
+    Simple_PlayerViewController *game=[[Simple_PlayerViewController alloc]initWithNibName:@"Simple_PlayerViewController" bundle:nil];
+    game.delegate=self.mainview;
+     [self presentViewController:game animated:YES completion:nil];
+
 }
 
 

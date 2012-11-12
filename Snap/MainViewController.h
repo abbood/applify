@@ -2,8 +2,8 @@
 #import "HostViewController.h"
 #import "JoinViewController.h"
 #import "GameViewController.h"
-
-@interface MainViewController : UIViewController <HostViewControllerDelegate, JoinViewControllerDelegate, GameViewControllerDelegate>
+#import "Simple_PlayerViewController.h"
+@interface MainViewController : UIViewController <HostViewControllerDelegate, JoinViewControllerDelegate, GameViewControllerDelegate, Simple_PlayerViewControllerDelegate>
 {
     IBOutlet UIImageView *spinner;
 }
