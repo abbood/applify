@@ -24,6 +24,7 @@
 - (void)hostViewController:(HostViewController *)controller startGameWithSession:(GKSession *)session playerName:(NSString *)name clients:(NSArray *)clients;
 
 - (void)hostViewController:(HostViewController *)controller broadcastMusicWithSession:(GKSession *)session playerName:(NSString *)name clients:(NSArray *)clients;
+- (void)changeView_playList:(HostViewController *)self;
 
 @end
 
@@ -55,6 +56,7 @@
 
 - (IBAction)startAction:(id)sender;
 - (IBAction)addMusic:(id)sender;
+- (IBAction)changeView_playList:(id)sender;
 
 +(id)sharedManager;
 -(IBAction)Playtouched:(id)sender;

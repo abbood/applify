@@ -3,6 +3,8 @@
 #import "UIButton+SnapAdditions.h"
 #import "Game.h"
 #import "AnimatedGif.h"
+#import "Simple_PlayerViewController.h"
+
 @interface MainViewController ()
 @property (nonatomic, weak) IBOutlet UIImageView *sImageView;
 @property (nonatomic, weak) IBOutlet UIImageView *nImageView;
@@ -263,7 +265,18 @@
 	}
 }
 
-- (void)hostViewController:(HostViewController *)controller 
+-(void)changeView_playList:(HostViewController *)controller
+{
+    Simple_PlayerViewController *simple_playlistViewController = [[Simple_PlayerViewController alloc]
+                                                                  initWithNibName:@"Simple_PlayerViewController"
+                                                                  bundle:nil];
+     simple_playlistViewController.delegate = self;
+    
+    [self presentViewController:simple_playlistViewController animated:NO completion:nil];
+}
+
+
+- (void)hostViewController:(HostViewController *)controller
       startGameWithSession:(GKSession *)session
                 playerName:(NSString *)name
                    clients:(NSArray *)clients

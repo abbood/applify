@@ -12,6 +12,7 @@
 #import "PeerCell.h"
 #import "MainViewController.h"
 #import "TestTableCell.h"
+#import "Simple_PlayerViewController.h"
 
 @interface HostViewController ()
 @property (nonatomic, weak) IBOutlet UILabel *headingLabel;
@@ -130,11 +131,10 @@
 }
 
 
--(void)handleClientJoin
+- (IBAction)changeView_playList:(id)sender
 {
-
+    [self.delegate changeView_playList:self];
 }
-
 
 
 - (IBAction)exitAction:(id)sender

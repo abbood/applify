@@ -59,6 +59,10 @@
 @property (nonatomic) NSInteger savedScopeButtonIndex;
 @property (nonatomic) BOOL searchWasActive;
 @property (nonatomic)BOOL collectionModified;
+@property (nonatomic, weak) id <SimpleViewController> delegate;
+
+
+
 +(id)sharedManager;
 - (IBAction)doTitleSearch;
 - (IBAction)showMediaPicker;

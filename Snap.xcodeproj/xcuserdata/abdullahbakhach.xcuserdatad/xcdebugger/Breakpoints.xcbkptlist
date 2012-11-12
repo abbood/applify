@@ -47,11 +47,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "Snap/MainViewController.m"
-         timestampString = "374164126.62715"
+         timestampString = "374417077.938237"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "366"
-         endingLineNumber = "366"
+         startingLineNumber = "378"
+         endingLineNumber = "378"
          landmarkName = "-gameViewController:switchToViewController:"
          landmarkType = "5">
       </FileBreakpoint>
@@ -59,13 +59,13 @@
          shouldBeEnabled = "Yes"
          ignoreCount = "0"
          continueAfterRunningActions = "No"
-         filePath = "Simple_PlayerViewController.m"
-         timestampString = "374410980.422366"
+         filePath = "Snap/MainViewController.m"
+         timestampString = "374417219.772314"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "204"
-         endingLineNumber = "204"
-         landmarkName = "-viewDidLoad"
+         startingLineNumber = "274"
+         endingLineNumber = "274"
+         landmarkName = "-changeView_playList:"
          landmarkType = "5">
       </FileBreakpoint>
    </FileBreakpoints>

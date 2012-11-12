@@ -14,7 +14,7 @@
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
-    Simple_PlayerViewController  *mainviewcontroller = [[Simple_PlayerViewController alloc] initWithNibName:@"Simple_PlayerViewController" bundle:nil];
+    MainViewController *mainviewcontroller = [[MainViewController alloc] initWithNibName:@"MainViewController" bundle:nil];
     // Override point for customization after application launch.
     
     self.window.backgroundColor = [UIColor whiteColor];
