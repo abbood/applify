@@ -130,7 +130,7 @@
         [player play];
         [playPauseButton setBackgroundImage:[UIImage imageNamed:@"pause.png"] forState:UIControlStateNormal];
     }
-    //  [self.tableView reloadData];
+
 }
 
 -(void)playOrPauseAtindex:(NSUInteger)sender
