@@ -10,15 +10,15 @@
 
 @interface PlayListTableCell : UITableViewCell
 {
-  UIButton *Add;
-  UIButton *Remove;
-  UILabel *SongName;
-  UILabel *Artistname;
+    UIButton *Add;
+    UIView *Remove;
+    UILabel *SongName;
+    UILabel *Artistname;
     
 }
 
 @property (nonatomic,retain)IBOutlet UIButton *Add;
-@property (nonatomic,retain)IBOutlet UIButton *Remove;
+@property (nonatomic,retain)IBOutlet UIView *Remove;
 @property (nonatomic,retain)IBOutlet UILabel *SongName;
 @property (nonatomic,retain)IBOutlet UILabel *Artistname;
 @property (nonatomic)int *row;

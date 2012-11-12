@@ -7,8 +7,8 @@
 //
 
 #import "PlayListTableCell.h"
-#import "MusicTableViewController.h"
-
+#import "Simple_PlayerViewController.h"
+#import "MPMediaItemCollection-Utils.h"
 @implementation PlayListTableCell
 @synthesize Add;
 @synthesize Remove;
@@ -16,29 +16,35 @@
 @synthesize row;
 -(IBAction)AddTouched:(id)sender
 {
-        if ([sender isSelected])
-        {
-            [sender setImage:[UIImage imageNamed:@"speakers states2.png"] forState:UIControlStateNormal];
-            [sender setSelected:NO];
-            self.SongName.textColor   = [UIColor darkGrayColor];
+    Simple_PlayerViewController *table=[[Simple_PlayerViewController alloc]init ];
     
-    
-               }
-        else {
-            [sender setImage:[UIImage imageNamed:@"speakers states3.png"]forState:UIControlStateSelected];
-            [sender
-             setSelected:YES];
-            UIImage *myGradient = [UIImage imageNamed:@"Gradient.png"];
-            self.SongName.textColor   = [UIColor colorWithPatternImage:myGradient];
-            MusicTableViewController *table=[[MusicTableViewController alloc]init ];
-          //  table.cellarray =[[NSMutableArray alloc]init];
-    
-            [table.cellarray replaceObjectAtIndex:self.row withObject:@"c"] ;
-        }
+    if ([sender isSelected])
+    {
+        [table.player setNowPlayingItem:nil];
+        [sender setImage:[UIImage imageNamed:@"speakers states2.png"] forState:UIControlStateNormal];
+        [sender setSelected:NO];
+        self.SongName.textColor   = [UIColor darkGrayColor];
+        [table playOrPauseAtindex:row];
+        
+        
+    }
+    else
+    {
+        [sender setImage:[UIImage imageNamed:@"speakers states3.png"]forState:UIControlStateSelected];
+        [sender setSelected:YES];
+        UIImage *myGradient = [UIImage imageNamed:@"Gradient.png"];
+        self.SongName.textColor   = [UIColor colorWithPatternImage:myGradient];
+        
+        //call play at index
+        
+        [table playOrPauseAtindex:row];
+    }
 }
 
 -(IBAction)RemoveTouched:(id)sender
 {
+    Simple_PlayerViewController *table=[[Simple_PlayerViewController alloc]init];
+    [table removeTrack:row];
     
 }
 - (id)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier
@@ -53,8 +59,22 @@
 - (void)setSelected:(BOOL)selected animated:(BOOL)animated
 {
     [super setSelected:selected animated:animated];
-
+    
     // Configure the view for the selected state
 }
+
+-(void)highlightRow
+{
+    [Add setImage:[UIImage imageNamed:@"speakers states3.png"]forState:UIControlStateSelected];
+    [Add setSelected:YES];
+    UIImage *myGradient = [UIImage imageNamed:@"Gradient.png"];
+    self.SongName.textColor = [UIColor colorWithPatternImage:myGradient];
+    Simple_PlayerViewController *table=[[Simple_PlayerViewController alloc]init ];
+    [table.cellarray replaceObjectAtIndex:self.row withObject:@"c"] ;
+    
+    
+    
+}
+
 
 @end

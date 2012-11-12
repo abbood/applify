@@ -1,6 +1,6 @@
 #import "Simple_PlayerViewController.h"
 #import "MPMediaItemCollection-Utils.h"
-
+#import "PlayListTableCell.h"
 #define kTableRowHeight 34
 
 @implementation Simple_PlayerViewController
@@ -10,15 +10,37 @@
 @synthesize player;
 @synthesize collection;
 @synthesize nowPlaying;
+@synthesize collectionModified;
 
-
-@synthesize searchDisplayController;
-@synthesize searchBar;
+@synthesize aSearchDisplayController;
+@synthesize searchbar2;
 //@synthesize allItems;
+@synthesize cellarray;
 @synthesize searchResults;
 
 #pragma mark -
++(id)sharedManager
+{
+    NSLog(@"----------------------------\n");
+    NSLog(@"<%@:%@:%d>", NSStringFromClass([self class]), NSStringFromSelector(_cmd), __LINE__);
+    static Simple_PlayerViewController *sharedclass1=nil;
+    if (!sharedclass1)
+    {
+        sharedclass1=[[super allocWithZone:nil]init];
+        sharedclass1.cellarray=[[NSMutableArray alloc]init];
+        
+    }
+    return sharedclass1;
+    
+}
++(id)allocWithZone:(NSZone *)zone
+{NSLog(@"----------------------------\n");
+    NSLog(@"<%@:%@:%d>", NSStringFromClass([self class]), NSStringFromSelector(_cmd), __LINE__);
+    return [self sharedManager];
+}
 - (IBAction)doTitleSearch {
+    NSLog(@"----------------------------\n");
+    NSLog(@"<%@:%@:%d>", NSStringFromClass([self class]), NSStringFromSelector(_cmd), __LINE__);
     if ([titleSearch.text length] == 0)
         return;
     MPMediaPropertyPredicate *titlePredicate =
@@ -49,6 +71,8 @@
 }
 
 - (IBAction)showMediaPicker {
+    NSLog(@"----------------------------\n");
+    NSLog(@"<%@:%@:%d>", NSStringFromClass([self class]), NSStringFromSelector(_cmd), __LINE__);
     MPMediaPickerController *picker = [[MPMediaPickerController alloc] initWithMediaTypes:MPMediaTypeMusic];
     picker.delegate = self;
     [picker setAllowsPickingMultipleItems:YES];
@@ -58,15 +82,21 @@
 }
 
 - (IBAction)backgroundClick {
+    NSLog(@"----------------------------\n");
+    NSLog(@"<%@:%@:%d>", NSStringFromClass([self class]), NSStringFromSelector(_cmd), __LINE__);
     [titleSearch resignFirstResponder];
 }
 
 - (IBAction)seekBackward {
+    NSLog(@"----------------------------\n");
+    NSLog(@"<%@:%@:%d>", NSStringFromClass([self class]), NSStringFromSelector(_cmd), __LINE__);
     [player beginSeekingBackward];
     pressStarted = [NSDate timeIntervalSinceReferenceDate];
 }
 
 - (IBAction)previousTrack {
+    NSLog(@"----------------------------\n");
+    NSLog(@"<%@:%@:%d>", NSStringFromClass([self class]), NSStringFromSelector(_cmd), __LINE__);
     [player endSeeking];
     
     if (pressStarted >= [NSDate timeIntervalSinceReferenceDate] - 0.1)
@@ -74,35 +104,70 @@
 }
 
 - (IBAction)seekForward {
+    NSLog(@"----------------------------\n");
+    NSLog(@"<%@:%@:%d>", NSStringFromClass([self class]), NSStringFromSelector(_cmd), __LINE__);
     [player beginSeekingForward];
     pressStarted = [NSDate timeIntervalSinceReferenceDate];
 }
 - (IBAction)nextTrack {
+    NSLog(@"----------------------------\n");
+    NSLog(@"<%@:%@:%d>", NSStringFromClass([self class]), NSStringFromSelector(_cmd), __LINE__);
     [player endSeeking];
     if (pressStarted >= [NSDate timeIntervalSinceReferenceDate] - 0.1)
         [player skipToNextItem];
 }
 
 - (IBAction)playOrPause {
+    NSLog(@"----------------------------\n");
+    NSLog(@"<%@:%@:%d>", NSStringFromClass([self class]), NSStringFromSelector(_cmd), __LINE__);
     if (player.playbackState == MPMusicPlaybackStatePlaying) {
         [player pause];
         [playPauseButton setBackgroundImage:[UIImage imageNamed:@"play.png"] forState:UIControlStateNormal];
     }
-    else {
+    else
+    {
+        
         [player play];
         [playPauseButton setBackgroundImage:[UIImage imageNamed:@"pause.png"] forState:UIControlStateNormal];
     }
-    [self.tableView reloadData];
+    //  [self.tableView reloadData];
 }
 
-- (IBAction)removeTrack:(id)sender {
-    NSUInteger index = [sender tag];
+-(void)playOrPauseAtindex:(NSUInteger)sender
+{NSLog(@"----------------------------\n");
+    NSLog(@"<%@:%@:%d>", NSStringFromClass([self class]), NSStringFromSelector(_cmd), __LINE__);
+    //compare the indeces
+    
+    
+    if (player.playbackState == MPMusicPlaybackStatePlaying)
+    {
+        
+        [player pause];
+        [playPauseButton setBackgroundImage:[UIImage imageNamed:@"play.png"] forState:UIControlStateNormal];
+    }
+    else
+    {
+        
+        NSUInteger index = sender;
+        [player setNowPlayingItem:[collection mediaItemAtIndex:index]];
+        [player play];
+        [playPauseButton setBackgroundImage:[UIImage imageNamed:@"pause.png"] forState:UIControlStateNormal];
+    }
+    
+    
+}
+//void with row number
+- (void)removeTrack:(NSUInteger)sender {
+    NSLog(@"----------------------------\n");
+    NSLog(@"<%@:%@:%d>", NSStringFromClass([self class]), NSStringFromSelector(_cmd), __LINE__);
+    NSUInteger index = sender;
     MPMediaItem *itemToDelete = [collection mediaItemAtIndex:index];
     if ([itemToDelete isEqual:nowPlaying])  {
         if (!collectionModified) {
             [player skipToNextItem];
         }
         else {
+            
             [player setQueueWithItemCollection:collection];
             player.nowPlayingItem = [collection mediaItemAfterItem:nowPlaying];
         }
@@ -125,18 +190,62 @@
 }
 
 #pragma mark -
-- (void)viewDidLoad {
+- (void)viewDidLoad
+{NSLog(@"----------------------------\n");
+    NSLog(@"<%@:%@:%d>", NSStringFromClass([self class]), NSStringFromSelector(_cmd), __LINE__);
+    
+    //-----------------
+    // UISearchBar *searchbar2 = [[UISearchBar alloc] initWithFrame:CGRectZero];
+    searchbar2.showsScopeBar = YES;
+    //[searchbar2 sizeToFit];
+    searchbar2.delegate = self;
+    UIImage *image=[UIImage imageNamed:@"searchbarBG1.png"];
+    
+    searchbar2.backgroundImage  =image;
+    
+    searchbar2.autocapitalizationType = UITextAutocapitalizationTypeNone;
+    searchbar2.autocorrectionType = UITextAutocorrectionTypeNo;
+    searchbar2.selectedScopeButtonIndex = 0;
+    searchbar2.placeholder = @"Search";
+    
+    UISearchDisplayController *searchDC = [[UISearchDisplayController alloc] initWithSearchBar:searchbar2 contentsController: self];
+    searchDC.delegate = self;
+    searchDC.searchResultsDataSource = self;
+    searchDC.searchResultsDelegate = self;
+    self.aSearchDisplayController = searchDC;
+    
+    
+	
+	// create a filtered list that will contain products for the search results table.
+	self.filteredListContent = [NSMutableArray arrayWithCapacity:[self.listContent count]];
+	
+	// restore search settings if they were saved in didReceiveMemoryWarning.
+    if (self.savedSearchTerm)
+	{
+        [aSearchDisplayController setActive:self.searchWasActive];
+        [aSearchDisplayController.searchBar setSelectedScopeButtonIndex:self.savedScopeButtonIndex];
+        [aSearchDisplayController.searchBar setText:savedSearchTerm];
+        self.savedSearchTerm = nil;
+    }
+	
+	[self.tableView reloadData];
+	self.tableView.scrollEnabled = YES;
+    //self.tableView.tableHeaderView = aSearchDisplayController.searchBar;
+    [aSearchDisplayController.searchBar becomeFirstResponder];
+    //-----------------
     MPMusicPlayerController *thePlayer = [MPMusicPlayerController iPodMusicPlayer];
     self.player = thePlayer;
-  
     
-    if (player.playbackState == MPMusicPlaybackStatePlaying) {
+    
+    if (player.playbackState == MPMusicPlaybackStatePlaying)
+    {
         [playPauseButton setBackgroundImage:[UIImage imageNamed:@"pause.png"] forState:UIControlStateNormal];
         MPMediaItemCollection *newCollection = [MPMediaItemCollection collectionWithItems:[NSArray arrayWithObject:[player nowPlayingItem]]];
         self.collection = newCollection;
-        self.nowPlaying = [player nowPlayingItem];
+        //self.nowPlaying = [player nowPlayingItem];
     }
-    else {
+    else
+    {
         [playPauseButton setBackgroundImage:[UIImage imageNamed:@"play.png"] forState:UIControlStateNormal];
     }
     
@@ -148,17 +257,24 @@
     
     [player beginGeneratingPlaybackNotifications];
     
-    self.allItems=[self.collection items];
+    
+    
+    
 }
 
 - (void)viewDidUnload {
+    NSLog(@"----------------------------\n");
+    NSLog(@"<%@:%@:%d>", NSStringFromClass([self class]), NSStringFromSelector(_cmd), __LINE__);
     self.titleSearch = nil;
     self.playPauseButton = nil;
     self.tableView = nil;
     [super viewDidUnload];
 }
 
-- (void)dealloc {
+- (void)dealloc
+{
+    NSLog(@"----------------------------\n");
+    NSLog(@"<%@:%@:%d>", NSStringFromClass([self class]), NSStringFromSelector(_cmd), __LINE__);
     
     NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
     [center removeObserver:self
@@ -175,12 +291,13 @@
    didPickMediaItems: (MPMediaItemCollection *) theCollection {
     [self dismissModalViewControllerAnimated: YES];
     
-    if (collection == nil){
+    if (collection == nil)
+    {
         self.collection = theCollection;
         [player setQueueWithItemCollection:collection];
         [player setNowPlayingItem:[collection firstMediaItem]];
         self.nowPlaying = [collection firstMediaItem];
-        [player play];
+        //    [player play];
         [playPauseButton setBackgroundImage:[UIImage imageNamed:@"pause.png"] forState:UIControlStateNormal];
     }
     else {
@@ -198,16 +315,21 @@
 #pragma mark -
 #pragma mark Player Notification Methods
 - (void)nowPlayingItemChanged:(NSNotification *)notification {
-    if (collection == nil) {
+    NSLog(@"----------------------------\n");
+    NSLog(@"<%@:%@:%d>", NSStringFromClass([self class]), NSStringFromSelector(_cmd), __LINE__);
+    if (collection == nil)
+    {
         MPMediaItem *nowPlayingItem = [player nowPlayingItem];
         self.collection = [collection collectionByAppendingMediaItem:nowPlayingItem];
     }
-    else {
+    else
+    {
         
-        if (collectionModified) {
+        if (collectionModified)
+        {
             [player setQueueWithItemCollection:collection];
-            [player setNowPlayingItem:[collection mediaItemAfterItem:nowPlaying]];
-            [player play];
+            //[player setNowPlayingItem:[collection mediaItemAfterItem:nowPlaying]];
+            //[player play];
         }
         
         if (![collection containsItem:player.nowPlayingItem] && player.nowPlayingItem != nil) {
@@ -231,54 +353,88 @@
 #pragma mark Table View Methods
 - (NSInteger)tableView:(UITableView *)theTableView numberOfRowsInSection:(NSInteger)section
 {
-    NSInteger rows=0;
-    if ([tableView isEqual:self.searchDisplayController.searchResultsTableView]) {
-        rows=[self.searchResults count];
+    NSLog(@"----------------------------\n");
+    NSLog(@"<%@:%@:%d>", NSStringFromClass([self class]), NSStringFromSelector(_cmd), __LINE__);
+    //    NSInteger rows=0;
+    //    if (tableView == self.searchDisplayController.searchResultsTableView) {
+    //        rows=[self.searchResults count];
+    //    }
+    //    else
+    //    {
+    //        return [collection count];
+    //    }
+    //return rows;
+    
+    if (tableView == aSearchDisplayController.searchResultsTableView)
+	{
+        return [self.filteredListContent count];
     }
-    else
-    {
+	else
+	{
         return [collection count];
     }
-return rows;
-
+    
 }
 
 - (UITableViewCell *)tableView:(UITableView *)theTableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
+    NSLog(@"----------------------------\n");
+    NSLog(@"<%@:%@:%d>", NSStringFromClass([self class]), NSStringFromSelector(_cmd), __LINE__);
     static NSString *identifier = @"Music Queue Cell";
-    UITableViewCell *cell = [theTableView dequeueReusableCellWithIdentifier:identifier];
-    if (cell == nil) {
-        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:identifier];
+    PlayListTableCell *cell = [theTableView dequeueReusableCellWithIdentifier:identifier];
+    if (cell == nil)
+    {
         
-        UIButton *removeButton = [UIButton buttonWithType:UIButtonTypeCustom];
-        UIImage *removeImage = [UIImage imageNamed:@"remove.png"];
-        [removeButton setBackgroundImage:removeImage forState:UIControlStateNormal];
-        [removeButton setFrame:CGRectMake(0.0, 0.0, removeImage.size.width, removeImage.size.height)];
-        [removeButton addTarget:self action:@selector(removeTrack:) forControlEvents:UIControlEventTouchUpInside];
-        cell.accessoryView  = removeButton;
-    }
-    if ([tableView isEqual:self.searchDisplayController.searchResultsTableView])
-    {
-        cell.textLabel.text=[self.searchResults objectAtIndex:indexPath.row];
-    }
-    else
-    {
-    cell.textLabel.text = [collection titleForMediaItemAtIndex:[indexPath row]];
-    if ([nowPlaying isEqual:[collection mediaItemAtIndex:[indexPath row]]])
-    {
-        cell.textLabel.font = [UIFont boldSystemFontOfSize:21.0];
-        if (player.playbackState ==  MPMusicPlaybackStatePlaying)
-            cell.imageView.image = [UIImage imageNamed:@"play_small.png"];
-        else
-            cell.imageView.image = [UIImage imageNamed:@"pause_small.png"];
+        cell = [[PlayListTableCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:[NSString stringWithFormat:@"%d",indexPath.row]];
+        NSArray* views = [[NSBundle mainBundle] loadNibNamed:@"PlayListTableCell" owner:nil options:nil];
         
-    }
-    else
-    {
-        cell.textLabel.font = [UIFont systemFontOfSize:21.0];
-        cell.imageView.image = [UIImage imageNamed:@"empty.png"];
+        for (UIView *view in views)
+        {
+            if([view isKindOfClass:[PlayListTableCell class]])
+            {
+                cell = (PlayListTableCell*)view;
+            }
+        }
+        //        UIButton *removeButton = [UIButton buttonWithType:UIButtonTypeCustom];
+        //        UIImage *removeImage = [UIImage imageNamed:@"delete song states1.png"];
+        //        [removeButton setBackgroundImage:removeImage forState:UIControlStateNormal];
+        //        [removeButton setFrame:CGRectMake(0.0, 5.0, removeImage.size.width-25, removeImage.size.height-10)];
+        //        [removeButton addTarget:self action:@selector(removeTrack:) forControlEvents:UIControlEventTouchUpInside];
+        //
+        //        cell.accessoryView  = removeButton;
     }
     
-    cell.accessoryView.tag = [indexPath row];
+    if (tableView == aSearchDisplayController.searchResultsTableView)
+    {
+        cell.SongName.text=[self.filteredListContent objectAtIndex:indexPath.row];
+    }
+    else
+    {
+        cell.SongName.text = [collection titleForMediaItemAtIndex:[indexPath row]];
+        
+        
+        
+        if ([nowPlaying isEqual:[collection mediaItemAtIndex:[indexPath row]]])
+        {
+            UIImage *myGradient = [UIImage imageNamed:@"Gradient.png"];
+            cell.SongName.textColor  = [UIColor colorWithPatternImage:myGradient];
+            if (player.playbackState ==  MPMusicPlaybackStatePlaying)
+            {
+                [cell.Add setImage:[UIImage imageNamed:@"speakers states3.png"]forState:UIControlStateSelected];
+                [cell.Add setSelected:YES];
+                
+            }
+            
+            
+            
+            
+        }
+        else
+        {
+            cell.SongName.font = [UIFont systemFontOfSize:21.0];
+            cell.imageView.image = [UIImage imageNamed:@"empty.png"];
+        }
+        
+        cell.row = [indexPath row];
     }
     
     
@@ -286,39 +442,63 @@ return rows;
 }
 
 - (void)tableView:(UITableView *)theTableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-    MPMediaItem *selected = [collection mediaItemAtIndex:[indexPath row]];
-    
-    if (collectionModified) {
-        [player setQueueWithItemCollection:collection];
-        collectionModified = NO;
-    }
-    
-    [player setNowPlayingItem:selected];
-    [player play];
-    
-    [playPauseButton setBackgroundImage:[UIImage imageNamed:@"pause.png"] forState:UIControlStateNormal];
-    [self.tableView reloadData];
+    NSLog(@"----------------------------\n");
+    NSLog(@"<%@:%@:%d>", NSStringFromClass([self class]), NSStringFromSelector(_cmd), __LINE__);
 }
 
-- (CGFloat)tableView:(UITableView *)theTableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
-    return kTableRowHeight;
-}
--(void)filterContentForSearchText:(NSString*)searchText scope:(NSString*)scope
+- (void)filterContentForSearchText:(NSString*)searchText scope:(NSString*)scope
 {
-    allItems =[[NSMutableArray alloc]initWithCapacity:[collection count]];
-    for (int i=0; i<[collection count]; i++)
-    {
-        [self.allItems insertObject:[collection titleForMediaItemAtIndex:i ] atIndex:i];
-    }
-    NSPredicate *resultPredicate=[NSPredicate predicateWithFormat:@"SELF contains[c] %@",searchText];
+    NSLog(@"----------------------------\n");
+    NSLog(@"<%@:%@:%d>", NSStringFromClass([self class]), NSStringFromSelector(_cmd), __LINE__);
+	/*
+	 Update the filtered array based on the search text and scope.
+	 */
+	
+	[self.filteredListContent removeAllObjects]; // First clear the filtered array.
+	
+	/*
+	 Search the main list for products whose type matches the scope (if selected) and whose name matches searchText; add items that match to the filtered array.
+	 */
     
-    self.searchResults=[self.allItems filteredArrayUsingPredicate:resultPredicate];
+    listContent=[collection items];
+	for (int i=0;i<[collection count];i++)
+	{
+        
+        
+        NSComparisonResult result = [[collection titleForMediaItemAtIndex:i] compare:searchText options:(NSCaseInsensitiveSearch|NSDiacriticInsensitiveSearch) range:NSMakeRange(0, [searchText length])];
+        if (result == NSOrderedSame)
+        {
+            [self.filteredListContent addObject:[collection titleForMediaItemAtIndex:i]];
+            tableView=aSearchDisplayController.searchResultsTableView;
+        }
+    }
 }
 
--(BOOL)searchDisplayController:(UISearchDisplayController *)controller shouldReloadTableForSearchScope:(NSInteger)searchOption
+
+#pragma mark -
+#pragma mark UISearchDisplayController Delegate Methods
+
+- (BOOL)searchDisplayController:(UISearchDisplayController *)controller shouldReloadTableForSearchString:(NSString *)searchString
 {
+    NSLog(@"----------------------------\n");
+    NSLog(@"<%@:%@:%d>", NSStringFromClass([self class]), NSStringFromSelector(_cmd), __LINE__);
+    [self filterContentForSearchText:searchString scope:
+     [[aSearchDisplayController.searchBar scopeButtonTitles] objectAtIndex:[aSearchDisplayController.searchBar selectedScopeButtonIndex]]];
     
-    [self filterContentForSearchText:[self.searchDisplayController.searchBar text] scope:[[self.searchDisplayController.searchBar scopeButtonTitles]objectAtIndex:searchOption]];
+    // Return YES to cause the search result table view to be reloaded.
     return YES;
 }
+
+
+- (BOOL)searchDisplayController:(UISearchDisplayController *)controller shouldReloadTableForSearchScope:(NSInteger)searchOption
+{
+    NSLog(@"----------------------------\n");
+    NSLog(@"<%@:%@:%d>", NSStringFromClass([self class]), NSStringFromSelector(_cmd), __LINE__);
+    [self filterContentForSearchText:[aSearchDisplayController.searchBar text] scope:
+     [[aSearchDisplayController.searchBar scopeButtonTitles] objectAtIndex:searchOption]];
+    
+    // Return YES to cause the search result table view to be reloaded.
+    return YES;
+}
+
 @end

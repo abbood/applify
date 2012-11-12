@@ -22,14 +22,22 @@
     BOOL                    collectionModified;
     NSTimeInterval          pressStarted;
     
-    UISearchDisplayController *searchDisplayController;
-    UISearchDisplayController *searchBar;
+    
     NSArray *allItems;
     NSArray *searchResults;
     
+    
+    NSArray			*listContent;			// The master content.
+    NSMutableArray	*filteredListContent;	// The content filtered as a result of a
+    NSString		*savedSearchTerm;
+    NSInteger		savedScopeButtonIndex;
+    BOOL			searchWasActive;
+    UISearchDisplayController *aSearchDisplayController;
+    UISearchBar *searchbar2;
+    
 }
-@property (nonatomic,retain)IBOutlet UISearchDisplayController *searchDisplayController;
-@property (nonatomic,retain)IBOutlet UISearchDisplayController *searchBar;
+
+
 @property (nonatomic,copy)NSMutableArray *allItems;
 @property (nonatomic,copy)NSArray *searchResults;
 
@@ -37,11 +45,21 @@
 @property (nonatomic, retain) IBOutlet UITextField *titleSearch;
 @property (nonatomic, retain) IBOutlet UIButton *playPauseButton;
 @property (nonatomic, retain) IBOutlet UITableView *tableView;
-
+@property (nonatomic,retain)NSMutableArray *cellarray;
 @property (nonatomic, retain) MPMusicPlayerController *player;
 @property (nonatomic, retain) MPMediaItemCollection *collection;
 @property (nonatomic, retain) MPMediaItem *nowPlaying;
 
+
+@property (nonatomic, retain) NSArray *listContent;
+@property (nonatomic, retain) NSMutableArray *filteredListContent;
+@property (nonatomic, retain) IBOutlet UISearchDisplayController *aSearchDisplayController;
+@property (nonatomic, retain) IBOutlet UISearchBar *searchbar2;
+@property (nonatomic, copy) NSString *savedSearchTerm;
+@property (nonatomic) NSInteger savedScopeButtonIndex;
+@property (nonatomic) BOOL searchWasActive;
+@property (nonatomic)BOOL collectionModified;
++(id)sharedManager;
 - (IBAction)doTitleSearch;
 - (IBAction)showMediaPicker;
 - (IBAction)backgroundClick;
@@ -51,8 +69,8 @@
 - (IBAction)seekForward;
 - (IBAction)nextTrack;
 - (IBAction)playOrPause;
-- (IBAction)removeTrack:(id)sender;
-
+- (void)removeTrack:(NSUInteger)sender;
+-(void)playOrPauseAtindex:(NSUInteger)sender;
 - (void)nowPlayingItemChanged:(NSNotification *)notification;
 @end
 

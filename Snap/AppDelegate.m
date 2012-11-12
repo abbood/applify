@@ -1,9 +1,10 @@
 
 #import "AppDelegate.h"
+#import "Simple_PlayerViewController.h"
 #import "MainViewController.h"
 #import "JoinViewController.h"
 #import "MusicTableViewController.h"
-#import "Simple_PlayerViewController.h"
+
 @implementation AppDelegate
 
 @synthesize window = _window;
@@ -13,7 +14,7 @@
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
-    MainViewController  *mainviewcontroller = [[MainViewController alloc] initWithNibName:@"MainViewController" bundle:nil];
+    Simple_PlayerViewController  *mainviewcontroller = [[Simple_PlayerViewController alloc] initWithNibName:@"Simple_PlayerViewController" bundle:nil];
     // Override point for customization after application launch.
     
     self.window.backgroundColor = [UIColor whiteColor];
