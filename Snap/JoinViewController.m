@@ -371,6 +371,8 @@
         NSString *peerID = [_matchmakingClient peerIDForAvailableServerAtIndex:indexPath.row];
         cell.PhoneName.text = [_matchmakingClient displayNameForPeerID:peerID];
         
+        NSLog(@"ABOUT TO ASK MATHMAKING CLIENT TO CONNECT TO SERVER!");
+        
 		[_matchmakingClient connectToServerWithPeerID:peerID];
         
         if ([self.cellarray objectAtIndex:indexPath.row ]!= @"c")

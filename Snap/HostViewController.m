@@ -452,7 +452,7 @@
 - (void) mediaPicker: (MPMediaPickerController *) mediaPicker didPickMediaItems: (MPMediaItemCollection *) mediaItemCollection {
     
 	// Dismiss the media item picker.
-	[self dismissModalViewControllerAnimated: YES];
+    [self dismissViewControllerAnimated:YES completion:nil];
 	
 	// Apply the chosen songs to the music player's queue.
 	[self updatePlayerQueueWithMediaCollection: mediaItemCollection];
@@ -464,7 +464,7 @@
 //		media items to play
 - (void) mediaPickerDidCancel: (MPMediaPickerController *) mediaPicker {
     
-	[self dismissModalViewControllerAnimated: YES];
+	[self dismissViewControllerAnimated:YES completion:nil];
 	
 	[[UIApplication sharedApplication] setStatusBarStyle: UIStatusBarStyleBlackOpaque animated: YES];
 }
@@ -474,7 +474,7 @@
 // Invoked when the user taps the Done button in the table view.
 - (void) musicTableViewControllerDidFinish: (MusicTableViewController *) controller {
 	
-	[self dismissModalViewControllerAnimated: YES];
+	[self dismissViewControllerAnimated:YES completion:nil];
 	[self restorePlaybackState];
 }
 
@@ -600,7 +600,7 @@
     NSString *title = [alertView buttonTitleAtIndex:buttonIndex];
     if ([title isEqualToString:@"OK"])
     {
-        [self.simplePlayerVC dismissModalViewControllerAnimated:YES];
+        [self.simplePlayerVC  dismissViewControllerAnimated:YES completion:nil];
     }
 }
 @end

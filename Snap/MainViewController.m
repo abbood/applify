@@ -68,6 +68,7 @@
     JoinViewController *controller = [[JoinViewController alloc] initWithNibName:@"JoinViewController" bundle:nil];
     controller.delegate = self;
     controller.mainview=self;
+    
     [self presentViewController:controller animated:NO completion:nil];
 	
 }

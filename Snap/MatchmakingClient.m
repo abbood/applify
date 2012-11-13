@@ -49,7 +49,7 @@
 - (void)connectToServerWithPeerID:(NSString *)peerID
 {
     [self logClientState:_clientState];
-	NSAssert(_clientState == ClientStateSearchingForServers, @"Wrong state");
+	//NSAssert(_clientState == ClientStateSearchingForServers, @"Wrong state");
     
 	_clientState = ClientStateConnecting;
 	_serverPeerID = peerID;

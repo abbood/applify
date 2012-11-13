@@ -79,7 +79,7 @@ static NSString *kCellIdentifier = @"Cell";
 // Responds to the user tapping Done after choosing music.
 - (void) mediaPicker: (MPMediaPickerController *) mediaPicker didPickMediaItems: (MPMediaItemCollection *) mediaItemCollection {
     
-	[self dismissModalViewControllerAnimated: YES];
+	[self dismissViewControllerAnimated:YES completion:nil];
 	[self.delegate updatePlayerQueueWithMediaCollection: mediaItemCollection];
   	[self.mediaItemCollectionTable reloadData];
     
@@ -90,7 +90,7 @@ static NSString *kCellIdentifier = @"Cell";
 // Responds to the user tapping done having chosen no music.
 - (void) mediaPickerDidCancel: (MPMediaPickerController *) mediaPicker {
     
-	[self dismissModalViewControllerAnimated: YES];
+	[self dismissViewControllerAnimated:YES completion:nil];
     
 	[[UIApplication sharedApplication] setStatusBarStyle: UIStatusBarStyleBlackOpaque animated:YES];
 }
