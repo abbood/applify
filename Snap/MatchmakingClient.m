@@ -48,13 +48,45 @@
 
 - (void)connectToServerWithPeerID:(NSString *)peerID
 {
-	NSAssert(_clientState == ClientStateSearchingForServers, @"Wrong state");
+    [self logClientState:_clientState];
+	//NSAssert(_clientState == ClientStateSearchingForServers, @"Wrong state");
     
 	_clientState = ClientStateConnecting;
 	_serverPeerID = peerID;
 	[_session connectToPeer:peerID withTimeout:_session.disconnectTimeout];
 }
 
+          
+-(void)logClientState:(ClientState)state
+{
+    switch (state) {
+        case ClientStateIdle:
+            NSLog(@"_clientState -> ClientStateIdle");
+            break;
+            
+        case ClientStateSearchingForServers:
+            NSLog(@"_clientState -> ClientStateSearchingForServers");
+            break;
+            
+        case ClientStateConnecting:
+            NSLog(@"_clientState -> ClientStateConnecting");
+            break;
+            
+        case ClientStateConnected:
+            NSLog(@"_clientState -> ClientStateConnected");
+            break;
+            
+        case ClientstateReceiving:
+            NSLog(@"_clientState -> ClientstateReceiving");
+            break;
+            
+        default:
+            break;
+    }
+}
+          
+          
+          
 #pragma mark - GKSessionDelegate
 
 - (void)session:(GKSession *)session peer:(NSString *)peerID didChangeState:(GKPeerConnectionState)state

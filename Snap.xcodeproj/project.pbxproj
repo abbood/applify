@@ -172,6 +172,7 @@
 		D7792F4016510F5B0017F4D2 /* searchbarBG1.png in Resources */ = {isa = PBXBuildFile; fileRef = D7792F3F16510F5B0017F4D2 /* searchbarBG1.png */; };
 		D7792F42165110500017F4D2 /* Default.png in Resources */ = {isa = PBXBuildFile; fileRef = D7792F41165110500017F4D2 /* Default.png */; };
 		D7792F44165111B70017F4D2 /* cell-background.png in Resources */ = {isa = PBXBuildFile; fileRef = D7792F43165111B70017F4D2 /* cell-background.png */; };
+		D7792F461651329E0017F4D2 /* Pause.png in Resources */ = {isa = PBXBuildFile; fileRef = D7792F451651329E0017F4D2 /* Pause.png */; };
 		D78E6CAF1615B39700A01CD6 /* VirtualRingBuffer.m in Sources */ = {isa = PBXBuildFile; fileRef = D78E6CAD1615B39700A01CD6 /* VirtualRingBuffer.m */; };
 		D7906A38161ABFA50000895B /* Logger.m in Sources */ = {isa = PBXBuildFile; fileRef = D7906A37161ABFA50000895B /* Logger.m */; };
 		D7A4E62F1623ED1400A7D642 /* PacketRecieved.m in Sources */ = {isa = PBXBuildFile; fileRef = D7A4E62E1623ED1400A7D642 /* PacketRecieved.m */; };
@@ -391,6 +392,7 @@
 		D7792F3F16510F5B0017F4D2 /* searchbarBG1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = searchbarBG1.png; sourceTree = "<group>"; };
 		D7792F41165110500017F4D2 /* Default.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Default.png; sourceTree = "<group>"; };
 		D7792F43165111B70017F4D2 /* cell-background.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "cell-background.png"; sourceTree = "<group>"; };
+		D7792F451651329E0017F4D2 /* Pause.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Pause.png; sourceTree = "<group>"; };
 		D78E6CAD1615B39700A01CD6 /* VirtualRingBuffer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VirtualRingBuffer.m; sourceTree = "<group>"; };
 		D78E6CAE1615B39700A01CD6 /* VirtualRingBuffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VirtualRingBuffer.h; sourceTree = "<group>"; };
 		D7906A36161ABFA50000895B /* Logger.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Logger.h; sourceTree = "<group>"; };
@@ -1186,14 +1188,15 @@
 		7B67D9F814C9C6AD00254619 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CODE_SIGN_IDENTITY = "";
+				CODE_SIGN_IDENTITY = "iPhone Developer: Abdullah Bakhach (VUEJF7MFYN)";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: Abdullah Bakhach (VUEJF7MFYN)";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Snap/Snap-Prefix.pch";
 				INFOPLIST_FILE = "Snap/Snap-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "F22362D3-A601-4AA3-86F1-49116A8D9A0E";
+				PROVISIONING_PROFILE = "FDB15567-F155-4DC7-ACBE-0570DDCB99ED";
+				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "FDB15567-F155-4DC7-ACBE-0570DDCB99ED";
 				RUN_CLANG_STATIC_ANALYZER = YES;
 				TARGETED_DEVICE_FAMILY = 1;
 				WARNING_CFLAGS = "-Wall";
@@ -1204,14 +1207,15 @@
 		7B67D9F914C9C6AD00254619 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CODE_SIGN_IDENTITY = "";
+				CODE_SIGN_IDENTITY = "iPhone Developer: Abdullah Bakhach (VUEJF7MFYN)";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: Abdullah Bakhach (VUEJF7MFYN)";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Snap/Snap-Prefix.pch";
 				INFOPLIST_FILE = "Snap/Snap-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "F22362D3-A601-4AA3-86F1-49116A8D9A0E";
+				PROVISIONING_PROFILE = "FDB15567-F155-4DC7-ACBE-0570DDCB99ED";
+				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "FDB15567-F155-4DC7-ACBE-0570DDCB99ED";
 				RUN_CLANG_STATIC_ANALYZER = YES;
 				TARGETED_DEVICE_FAMILY = 1;
 				WARNING_CFLAGS = "-Wall";

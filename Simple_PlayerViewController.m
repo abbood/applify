@@ -18,6 +18,7 @@
 //@synthesize allItems;
 @synthesize cellarray;
 @synthesize searchResults;
+@synthesize hostViewController = _hostViewController;
 
 #pragma mark -
 +(id)sharedManager
@@ -131,7 +132,14 @@
         [player play];
         [playPauseButton setBackgroundImage:[UIImage imageNamed:@"pause.png"] forState:UIControlStateNormal];
     }
-    //  [self.tableView reloadData];
+
+}
+
+-(IBAction)changeViewHost:(id)sender
+{
+    
+    [self dismissViewControllerAnimated:YES completion:nil];
+    
 }
 -(IBAction)changeViewHost:(id)sender
 {
@@ -154,11 +162,8 @@
     }
     else
     {
-        
         NSUInteger index = sender;
-        [player setNowPlayingItem:[collection mediaItemAtIndex:index]];
-        [player play];
-        [playPauseButton setBackgroundImage:[UIImage imageNamed:@"pause.png"] forState:UIControlStateNormal];
+        [self.hostViewController startBroadcastSequence];         
     }
     
     
@@ -290,7 +295,7 @@
 #pragma mark Media Picker Delegate Methods
 - (void) mediaPicker: (MPMediaPickerController *) mediaPicker
    didPickMediaItems: (MPMediaItemCollection *) theCollection {
-    [self dismissModalViewControllerAnimated: YES];
+    [self dismissViewControllerAnimated:YES completion:nil];
     
     if (collection == nil)
     {
@@ -310,7 +315,7 @@
 }
 
 - (void) mediaPickerDidCancel: (MPMediaPickerController *) mediaPicker {
-    [self dismissModalViewControllerAnimated: YES];
+    [self dismissViewControllerAnimated:YES completion:nil];
 }
 
 #pragma mark -

@@ -21,7 +21,7 @@
     if ([sender isSelected])
     {
         [table.player setNowPlayingItem:nil];
-        [sender setImage:[UIImage imageNamed:@"speakers states2.png"] forState:UIControlStateNormal];
+        [sender setImage:[UIImage imageNamed:@"Pause.png"] forState:UIControlStateNormal];
         [sender setSelected:NO];
         self.SongName.textColor   = [UIColor darkGrayColor];
         [table playOrPauseAtindex:row];

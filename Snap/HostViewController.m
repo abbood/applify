@@ -46,6 +46,7 @@
 @synthesize delegate = _delegate;
 @synthesize cell = _cell;
 @synthesize game = _game;
+@synthesize simplePlayerVC = _simplePlayerVC;
 
 @synthesize userMediaItemCollection;
 @synthesize playedMusicOnce;			// A flag indicating if the user has played iPod library music at least one time
@@ -134,10 +135,12 @@
 	return FALSE;
 }
 
-- (IBAction)startAction:(id)sender
+- (BOOL)startBroadcastSequence
 {
     NSLog(@"----------------------------\n");
     NSLog(@"<%@:%@:%d>", NSStringFromClass([self class]), NSStringFromSelector(_cmd), __LINE__);
+    
+    
 	if (_matchmakingServer != nil && [_matchmakingServer connectedClientCount] > 0)
 	{
         // only when the game starts we stop accepting connections
@@ -145,19 +148,26 @@
         NSLog(@"SERVER: sending sign in request");
         Packet *packet = [Packet packetWithType:PacketTypeSignInRequest];
         [_game sendPacketToAllClients:packet];
-	}
+        return YES;
+	} else {
+        [self showNoPeersConnectedAlert];
+        return NO;
+    }
 }
 
 
 - (IBAction)changeView_playList:(id)sender
 {
-    Simple_PlayerViewController *game=[[Simple_PlayerViewController alloc]initWithNibName:@"Simple_PlayerViewController" bundle:nil];
-    game.mainview=self.mainview;
-    game.delegate=self.mainview;
-    [self presentViewController:game animated:YES completion:nil];
-    [self dismissModalViewControllerAnimated:YES];
-
-
+    _simplePlayerVC = [[Simple_PlayerViewController alloc]
+                                            initWithNibName:@"Simple_PlayerViewController"
+                                                     bundle:nil];
+    
+    //TODO: this is confusing.. better architecture required
+    _simplePlayerVC.delegate = self.mainview;
+    // we need a reference of the hostVC b/c it has a reference
+    // to the matchMakingServer
+    _simplePlayerVC.hostViewController = self;
+    [self presentViewController:_simplePlayerVC animated:YES completion:nil];
 }
 
 
@@ -172,6 +182,11 @@
 #pragma mark Music control________________________________
 
 - (IBAction)addMusic:(id)sender
+{
+    [self performAddMusicActions];
+}
+
+-(void)performAddMusicActions
 {
     // if the user has already chosen some music, display that list
 	if (userMediaItemCollection) {
@@ -195,6 +210,7 @@
 		
 		[self presentModalViewController: picker animated: YES];
 	}
+    
 }
 
 // Invoked by the delegate of the media item picker when the user is finished picking music.
@@ -454,7 +470,7 @@
 - (void) mediaPicker: (MPMediaPickerController *) mediaPicker didPickMediaItems: (MPMediaItemCollection *) mediaItemCollection {
     
 	// Dismiss the media item picker.
-	[self dismissModalViewControllerAnimated: YES];
+    [self dismissViewControllerAnimated:YES completion:nil];
 	
 	// Apply the chosen songs to the music player's queue.
 	[self updatePlayerQueueWithMediaCollection: mediaItemCollection];
@@ -466,7 +482,7 @@
 //		media items to play
 - (void) mediaPickerDidCancel: (MPMediaPickerController *) mediaPicker {
     
-	[self dismissModalViewControllerAnimated: YES];
+	[self dismissViewControllerAnimated:YES completion:nil];
 	
 	[[UIApplication sharedApplication] setStatusBarStyle: UIStatusBarStyleBlackOpaque animated: YES];
 }
@@ -476,7 +492,7 @@
 // Invoked when the user taps the Done button in the table view.
 - (void) musicTableViewControllerDidFinish: (MusicTableViewController *) controller {
 	
-	[self dismissModalViewControllerAnimated: YES];
+	[self dismissViewControllerAnimated:YES completion:nil];
 	[self restorePlaybackState];
 }
 
@@ -583,5 +599,26 @@
     //	}		
 }
 
+#pragma mark - Alerts
 
+- (void)showNoPeersConnectedAlert
+{
+	UIAlertView *alertView = [[UIAlertView alloc]
+                              initWithTitle:NSLocalizedString(@"No Peers connected", @"No Peers connected alert title")
+                              message:NSLocalizedString(@"You must add peers to the session before you begin broadcast!", @"No Peers connected alert message")
+                              delegate:self
+                              cancelButtonTitle:NSLocalizedString(@"OK", @"Button: OK")
+                              otherButtonTitles:nil];
+    
+	[alertView show];
+}
+
+- (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
+{
+    NSString *title = [alertView buttonTitleAtIndex:buttonIndex];
+    if ([title isEqualToString:@"OK"])
+    {
+        [self.simplePlayerVC  dismissViewControllerAnimated:YES completion:nil];
+    }
+}
 @end

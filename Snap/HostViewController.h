@@ -13,9 +13,11 @@
 #import "MusicTableViewController.h"
 #import "TestTableCell.h"
 #import "Game.h"
+#import "Simple_PlayerViewController.h"
 
 @class HostViewController;
 @class Game;
+@class Simple_PlayerViewController;
 
 @protocol HostViewControllerDelegate <NSObject>
 
@@ -24,7 +26,6 @@
 - (void)hostViewController:(HostViewController *)controller startGameWithSession:(GKSession *)session playerName:(NSString *)name clients:(NSArray *)clients;
 
 - (void)hostViewController:(HostViewController *)controller broadcastMusicWithSession:(GKSession *)session playerName:(NSString *)name clients:(NSArray *)clients;
-- (void)changeView_playList:(HostViewController *)self;
 
 @end
 
@@ -54,7 +55,8 @@
 @property (nonatomic, strong)TestTableCell *cell;
 @property (nonatomic, strong)Game *game;
 @property (nonatomic,retain)MainViewController *mainview;
-- (IBAction)startAction:(id)sender;
+@property (nonatomic, weak)Simple_PlayerViewController * simplePlayerVC;
+- (BOOL)startBroadcastSequence;
 - (IBAction)addMusic:(id)sender;
 - (IBAction)changeView_playList:(id)sender;
 
