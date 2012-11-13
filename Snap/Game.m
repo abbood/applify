@@ -116,9 +116,7 @@
     // we are still available.. b/c clients can still connect
 //	_session.available = NO;
 	_session.delegate = self;
-	[_session setDataReceiveHandler:self withContext:nil];
-    
-	_state = GameStateWaitingForSignIn;
+	[_session setDataReceiveHandler:self withContext:nil];    
     
 	[self.delegate gameWaitingForClientsReady:self];
     
@@ -508,7 +506,8 @@ void CalculateBytesForTime(AudioStreamBasicDescription inDesc, Float64 inSeconds
                     
                     _format = [self getTrackNativeSettings:
                                [self extractTrackFromMediaItemCollection:
-                                hostViewController.userMediaItemCollection]];
+                                hostViewController.simplePlayerVC.collection]];
+                    
                     CalculateBytesForTime(_format, 0.5, &_bufferByteSize, &_numPacketsToRead); 
                     
                     Packet *packet = [PacketServerReady packetWithPlayers:_players
@@ -1006,7 +1005,7 @@ static void CheckError (OSStatus error, const char *operation)
 -(void)setUpReader
 {
 
-    MPMediaItemCollection	*userMediaItemCollection = hostViewController.userMediaItemCollection;
+    MPMediaItemCollection	*userMediaItemCollection = hostViewController.simplePlayerVC.collection;
     NSArray *items = [userMediaItemCollection items];
     
     

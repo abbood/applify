@@ -62,7 +62,7 @@
 
 - (void)viewWillAppear:(BOOL)animated
 {
-    NSLog(@"I AM MAIN VIEW AND I APPEARED!");
+    NSLog(@"I AM MAIN VIEW AND I WILL APPEAR!");
 	[super viewWillAppear:animated];
     
     JoinViewController *controller = [[JoinViewController alloc] initWithNibName:@"JoinViewController" bundle:nil];
@@ -263,16 +263,6 @@
 	{
 		[self showNoNetworkAlert];
 	}
-}
-
--(void)changeView_playList:(HostViewController *)controller
-{
-    Simple_PlayerViewController *simple_playlistViewController = [[Simple_PlayerViewController alloc]
-                                                                  initWithNibName:@"Simple_PlayerViewController"
-                                                                  bundle:nil];
-  
-    
-    [[self navigationController] pushViewController:simple_playlistViewController animated:NO];
 }
 
 

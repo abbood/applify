@@ -46,6 +46,7 @@
 @synthesize delegate = _delegate;
 @synthesize cell = _cell;
 @synthesize game = _game;
+@synthesize simplePlayerVC = _simplePlayerVC;
 
 @synthesize userMediaItemCollection;
 @synthesize playedMusicOnce;			// A flag indicating if the user has played iPod library music at least one time
@@ -116,10 +117,12 @@
 	return FALSE;
 }
 
-- (IBAction)startAction:(id)sender
+- (void)startBroadcastSequence
 {
     NSLog(@"----------------------------\n");
     NSLog(@"<%@:%@:%d>", NSStringFromClass([self class]), NSStringFromSelector(_cmd), __LINE__);
+    
+    
 	if (_matchmakingServer != nil && [_matchmakingServer connectedClientCount] > 0)
 	{
         // only when the game starts we stop accepting connections
@@ -127,16 +130,25 @@
         NSLog(@"SERVER: sending sign in request");
         Packet *packet = [Packet packetWithType:PacketTypeSignInRequest];
         [_game sendPacketToAllClients:packet];
-	}
+	} else {
+        [self showNoPeersConnectedAlert];
+      
+    }
 }
 
 
 - (IBAction)changeView_playList:(id)sender
 {
-    Simple_PlayerViewController *game=[[Simple_PlayerViewController alloc]initWithNibName:@"Simple_PlayerViewController" bundle:nil];
-    game.delegate=self.mainview;
-     [self presentViewController:game animated:YES completion:nil];
-
+    _simplePlayerVC = [[Simple_PlayerViewController alloc]
+                                            initWithNibName:@"Simple_PlayerViewController"
+                                                     bundle:nil];
+    
+    //TODO: this is confusing.. better architecture required
+    _simplePlayerVC.delegate = self.mainview;
+    // we need a reference of the hostVC b/c it has a reference
+    // to the matchMakingServer
+    _simplePlayerVC.hostViewController = self;
+    [self presentViewController:_simplePlayerVC animated:YES completion:nil];
 }
 
 
@@ -151,6 +163,11 @@
 #pragma mark Music control________________________________
 
 - (IBAction)addMusic:(id)sender
+{
+    [self performAddMusicActions];
+}
+
+-(void)performAddMusicActions
 {
     // if the user has already chosen some music, display that list
 	if (userMediaItemCollection) {
@@ -174,6 +191,7 @@
 		
 		[self presentModalViewController: picker animated: YES];
 	}
+    
 }
 
 // Invoked by the delegate of the media item picker when the user is finished picking music.
@@ -562,5 +580,30 @@
     //	}		
 }
 
+#pragma mark - Alerts
 
+- (void)showNoPeersConnectedAlert
+{
+	UIAlertView *alertView = [[UIAlertView alloc]
+                              initWithTitle:NSLocalizedString(@"No Peers connected", @"No Peers connected alert title")
+                              message:NSLocalizedString(@"You must add peers to the session before you begin broadcast!", @"No Peers connected alert message")
+                              delegate:self
+                              cancelButtonTitle:NSLocalizedString(@"OK", @"Button: OK")
+                              otherButtonTitles:nil];
+    
+	[alertView show];
+}
+
+- (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
+{
+    NSString *title = [alertView buttonTitleAtIndex:buttonIndex];
+    if ([title isEqualToString:@"OK"])
+    {
+        HostViewController *hostViewController =
+        [[HostViewController alloc] initWithNibName:@"HostViewController"
+                                             bundle:nil];
+        
+        [self presentViewController:hostViewController animated:YES completion:nil];
+    }
+}
 @end

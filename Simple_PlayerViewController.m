@@ -17,6 +17,7 @@
 //@synthesize allItems;
 @synthesize cellarray;
 @synthesize searchResults;
+@synthesize hostViewController = _hostViewController;
 
 #pragma mark -
 +(id)sharedManager
@@ -133,6 +134,13 @@
 
 }
 
+-(IBAction)changeViewHost:(id)sender
+{
+    
+    [self dismissModalViewControllerAnimated:YES];
+    
+}
+
 -(void)playOrPauseAtindex:(NSUInteger)sender
 {NSLog(@"----------------------------\n");
     NSLog(@"<%@:%@:%d>", NSStringFromClass([self class]), NSStringFromSelector(_cmd), __LINE__);
@@ -149,9 +157,13 @@
     {
         
         NSUInteger index = sender;
+        
+        [self.hostViewController startBroadcastSequence];
+        
         [player setNowPlayingItem:[collection mediaItemAtIndex:index]];
         [player play];
         [playPauseButton setBackgroundImage:[UIImage imageNamed:@"pause.png"] forState:UIControlStateNormal];
+         
     }
     
     

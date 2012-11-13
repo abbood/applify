@@ -10,6 +10,9 @@
 
 #import <UIKit/UIKit.h>
 #import <MediaPlayer/MediaPlayer.h>
+#import "HostViewController.h"
+
+@class HostViewController;
 @protocol Simple_PlayerViewControllerDelegate <NSObject>
 
 
@@ -50,7 +53,7 @@
 @property (nonatomic, retain) IBOutlet UITextField *titleSearch;
 @property (nonatomic, retain) IBOutlet UIButton *playPauseButton;
 @property (nonatomic, retain) IBOutlet UITableView *tableView;
-@property (nonatomic,retain)NSMutableArray *cellarray;
+@property (nonatomic, retain) NSMutableArray *cellarray;
 @property (nonatomic, retain) MPMusicPlayerController *player;
 @property (nonatomic, retain) MPMediaItemCollection *collection;
 @property (nonatomic, retain) MPMediaItem *nowPlaying;
@@ -66,6 +69,8 @@
 @property (nonatomic)BOOL collectionModified;
 @property (nonatomic, weak) id <Simple_PlayerViewControllerDelegate> delegate;
 
+@property (nonatomic, strong) HostViewController *hostViewController;
+
 
 
 +(id)sharedManager;
@@ -78,6 +83,7 @@
 - (IBAction)seekForward;
 - (IBAction)nextTrack;
 - (IBAction)playOrPause;
+-(IBAction)changeViewHost:(id)sender;
 - (void)removeTrack:(NSUInteger)sender;
 -(void)playOrPauseAtindex:(NSUInteger)sender;
 - (void)nowPlayingItemChanged:(NSNotification *)notification;
