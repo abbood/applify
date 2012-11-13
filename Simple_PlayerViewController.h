@@ -10,6 +10,7 @@
 
 #import <UIKit/UIKit.h>
 #import <MediaPlayer/MediaPlayer.h>
+@class MainViewController;
 @protocol Simple_PlayerViewControllerDelegate <NSObject>
 
 
@@ -65,7 +66,7 @@
 @property (nonatomic) BOOL searchWasActive;
 @property (nonatomic)BOOL collectionModified;
 @property (nonatomic, weak) id <Simple_PlayerViewControllerDelegate> delegate;
-
+@property (nonatomic,retain)MainViewController *mainview;
 
 
 +(id)sharedManager;
@@ -78,6 +79,7 @@
 - (IBAction)seekForward;
 - (IBAction)nextTrack;
 - (IBAction)playOrPause;
+-(IBAction)changeViewHost:(id)sender;
 - (void)removeTrack:(NSUInteger)sender;
 -(void)playOrPauseAtindex:(NSUInteger)sender;
 - (void)nowPlayingItemChanged:(NSNotification *)notification;

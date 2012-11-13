@@ -68,6 +68,24 @@
 @synthesize SongDuration;
 @synthesize ProgressBar;
 
++(id)sharedManager
+{
+    
+    static HostViewController *sharedclass1=nil;
+    if (!sharedclass1)
+    {
+        sharedclass1=[[super allocWithZone:nil]init];
+        sharedclass1.cellarray=[[NSMutableArray alloc]init];
+        
+    }
+    return sharedclass1;
+    
+}
+
++(id)allocWithZone:(NSZone *)zone
+{
+    return [self sharedManager];
+}
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -134,8 +152,11 @@
 - (IBAction)changeView_playList:(id)sender
 {
     Simple_PlayerViewController *game=[[Simple_PlayerViewController alloc]initWithNibName:@"Simple_PlayerViewController" bundle:nil];
+    game.mainview=self.mainview;
     game.delegate=self.mainview;
-     [self presentViewController:game animated:YES completion:nil];
+    [self presentViewController:game animated:YES completion:nil];
+    [self dismissModalViewControllerAnimated:YES];
+
 
 }
 

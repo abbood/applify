@@ -1,6 +1,7 @@
 #import "Simple_PlayerViewController.h"
 #import "MPMediaItemCollection-Utils.h"
 #import "PlayListTableCell.h"
+#import "HostViewController.h"
 #define kTableRowHeight 34
 
 @implementation Simple_PlayerViewController
@@ -132,6 +133,12 @@
     }
     //  [self.tableView reloadData];
 }
+-(IBAction)changeViewHost:(id)sender
+{
+    
+    [self dismissModalViewControllerAnimated:YES];
+   
+}
 
 -(void)playOrPauseAtindex:(NSUInteger)sender
 {NSLog(@"----------------------------\n");
@@ -194,20 +201,15 @@
 {NSLog(@"----------------------------\n");
     NSLog(@"<%@:%@:%d>", NSStringFromClass([self class]), NSStringFromSelector(_cmd), __LINE__);
     
-    //-----------------
-    // UISearchBar *searchbar2 = [[UISearchBar alloc] initWithFrame:CGRectZero];
-    searchbar2.showsScopeBar = YES;
-    //[searchbar2 sizeToFit];
+    
     searchbar2.delegate = self;
     UIImage *image=[UIImage imageNamed:@"searchbarBG1.png"];
     
     searchbar2.backgroundImage  =image;
     
-    searchbar2.autocapitalizationType = UITextAutocapitalizationTypeNone;
-    searchbar2.autocorrectionType = UITextAutocorrectionTypeNo;
-    searchbar2.selectedScopeButtonIndex = 0;
+    searchbar2.showsCancelButton=NO;
     searchbar2.placeholder = @"Search";
-    
+   
     UISearchDisplayController *searchDC = [[UISearchDisplayController alloc] initWithSearchBar:searchbar2 contentsController: self];
     searchDC.delegate = self;
     searchDC.searchResultsDataSource = self;
@@ -257,8 +259,7 @@
     
     [player beginGeneratingPlaybackNotifications];
     
-    
-    
+        
     
 }
 

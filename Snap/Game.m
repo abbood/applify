@@ -176,10 +176,12 @@
         NSLog(@"ClIENT: sending PacketTypeJoinResponse to server");
         Packet *packet = [Packet packetWithType:PacketTypeJoinResponse];
         [self sendPacketToServer:packet];
-        GameViewController *gameController = [[GameViewController alloc] initWithNibName:@"GameViewController" bundle:nil];
+        GameViewController *controller = [[GameViewController alloc] initWithNibName:@"GameViewController" bundle:nil];
+        controller.delegate = self.hostViewController.mainview;
         
+        [self.hostViewController presentViewController:controller animated:NO completion:nil];
         // show the soundSpeaker view
-        [self.delegate game:self switchToViewController:gameController];
+        
     }
 }
 

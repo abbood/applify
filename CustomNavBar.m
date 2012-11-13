@@ -25,7 +25,7 @@
 - (void)drawRect:(CGRect)rect
 {
     // Drawing code
-    UIImage *image=[UIImage imageNamed:@"iPadNavigationBar.png"];
+    UIImage *image=[UIImage imageNamed:@"ApplifyIcon.png"];
     [image drawInRect:CGRectMake(0, 0, self.frame.size.width, self.frame.size.height)];
 }
 

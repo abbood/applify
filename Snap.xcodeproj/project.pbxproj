@@ -58,6 +58,8 @@
 		7BF49EAB14EBBB7300AB8472 /* Icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 7BF49EA414EBBB7300AB8472 /* Icon.png */; };
 		7BF49EAC14EBBB7300AB8472 /* Icon@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 7BF49EA514EBBB7300AB8472 /* Icon@2x.png */; };
 		7BF49EAD14EBBB7300AB8472 /* iTunesArtwork in Resources */ = {isa = PBXBuildFile; fileRef = 7BF49EA614EBBB7300AB8472 /* iTunesArtwork */; };
+		CE81943016527A7500004C2A /* ApplifyIcon.png in Resources */ = {isa = PBXBuildFile; fileRef = CE81942F16527A7500004C2A /* ApplifyIcon.png */; };
+		CEB6876B165147AF00F4EFD2 /* receiver.png in Resources */ = {isa = PBXBuildFile; fileRef = CEB6876A165147AF00F4EFD2 /* receiver.png */; };
 		D70BFFF8164BE20100445F4C /* JoinViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D70BFFF7164BE20100445F4C /* JoinViewController.m */; };
 		D70BFFFB164BEB2E00445F4C /* JoinViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = D70BFFFA164BEB2E00445F4C /* JoinViewController.xib */; };
 		D71514B316021713006B9374 /* AudioItem.m in Sources */ = {isa = PBXBuildFile; fileRef = D71514B216021713006B9374 /* AudioItem.m */; };
@@ -255,6 +257,8 @@
 		7BF49EA414EBBB7300AB8472 /* Icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Icon.png; sourceTree = "<group>"; };
 		7BF49EA514EBBB7300AB8472 /* Icon@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Icon@2x.png"; sourceTree = "<group>"; };
 		7BF49EA614EBBB7300AB8472 /* iTunesArtwork */ = {isa = PBXFileReference; lastKnownFileType = file; path = iTunesArtwork; sourceTree = "<group>"; };
+		CE81942F16527A7500004C2A /* ApplifyIcon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = ApplifyIcon.png; sourceTree = "<group>"; };
+		CEB6876A165147AF00F4EFD2 /* receiver.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = receiver.png; sourceTree = "<group>"; };
 		D70BFFF7164BE20100445F4C /* JoinViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = JoinViewController.m; path = Snap/JoinViewController.m; sourceTree = "<group>"; };
 		D70BFFF9164BEAB500445F4C /* JoinViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = JoinViewController.h; path = Snap/JoinViewController.h; sourceTree = "<group>"; };
 		D70BFFFA164BEB2E00445F4C /* JoinViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = JoinViewController.xib; sourceTree = "<group>"; };
@@ -484,6 +488,8 @@
 		7B2B314014CC726A0002F476 /* Images */ = {
 			isa = PBXGroup;
 			children = (
+				CE81942F16527A7500004C2A /* ApplifyIcon.png */,
+				CEB6876A165147AF00F4EFD2 /* receiver.png */,
 				D7792F43165111B70017F4D2 /* cell-background.png */,
 				D7792F3F16510F5B0017F4D2 /* searchbarBG1.png */,
 				D7792F3B16510CAF0017F4D2 /* playlistBG1.png */,
@@ -594,19 +600,16 @@
 				D719A5D0164BCAA100490583 /* CustomNavBar.h */,
 				D719A5D3164BCAAF00490583 /* CustomSearchBar.h */,
 				35E6470D1570408A00F1073A /* GameViewController.h */,
-				E110A109156ECC870045AB96 /* HostViewController.h */,
 				D70BFFF9164BEAB500445F4C /* JoinViewController.h */,
 				D719A5CB164BC8F400490583 /* MPMediaItemCollection-Utils.h */,
 				D72C642315E8D047004ADD51 /* MusicTableViewController.h */,
 				D719A5B8164BA93700490583 /* PlayListTableCell.h */,
 				D719A5AE164BA8E700490583 /* ReciverViewController.h */,
-				D719A5BD164BA94100490583 /* Simple_PlayerViewController.h */,
 				D719A5B3164BA92E00490583 /* TestTableCell.h */,
 				D719A5AB164BA7A400490583 /* AnimatedGif.m */,
 				D719A5D1164BCAA100490583 /* CustomNavBar.m */,
 				D719A5D4164BCAAF00490583 /* CustomSearchBar.m */,
 				35E6470E1570408B00F1073A /* GameViewController.m */,
-				E110A10A156ECC870045AB96 /* HostViewController.m */,
 				D7D64EAD164BF36F00A896FE /* MainViewController.h */,
 				D7D64EAE164BF36F00A896FE /* MainViewController.m */,
 				D70BFFF7164BE20100445F4C /* JoinViewController.m */,
@@ -614,15 +617,18 @@
 				D72C642415E8D047004ADD51 /* MusicTableViewController.m */,
 				D719A5B9164BA93700490583 /* PlayListTableCell.m */,
 				D719A5AF164BA8E700490583 /* ReciverViewController.m */,
-				D719A5BE164BA94100490583 /* Simple_PlayerViewController.m */,
 				D719A5B4164BA92E00490583 /* TestTableCell.m */,
 				D70BFFFA164BEB2E00445F4C /* JoinViewController.xib */,
 				D72C642615E8D62B004ADD51 /* MusicTableView.xib */,
+				D719A5BD164BA94100490583 /* Simple_PlayerViewController.h */,
+				D719A5BE164BA94100490583 /* Simple_PlayerViewController.m */,
 				D74204AE1651091C00C6991C /* Simple_PlayerViewController.xib */,
 				D7D64EAA164BF30600A896FE /* MainViewController.xib */,
 				D719A5BA164BA93700490583 /* PlayListTableCell.xib */,
 				D719A5B0164BA8E700490583 /* ReciverViewController.xib */,
 				D7D64EA3164BF2F900A896FE /* GameViewController.xib */,
+				E110A109156ECC870045AB96 /* HostViewController.h */,
+				E110A10A156ECC870045AB96 /* HostViewController.m */,
 				D7D64EA7164BF30200A896FE /* HostViewController.xib */,
 				D719A5B5164BA92E00490583 /* TestTableCell.xib */,
 			);
@@ -1030,6 +1036,8 @@
 				D7792F4016510F5B0017F4D2 /* searchbarBG1.png in Resources */,
 				D7792F42165110500017F4D2 /* Default.png in Resources */,
 				D7792F44165111B70017F4D2 /* cell-background.png in Resources */,
+				CEB6876B165147AF00F4EFD2 /* receiver.png in Resources */,
+				CE81943016527A7500004C2A /* ApplifyIcon.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -293,6 +293,7 @@
          
          [self startGameWithBlockhost:^(Game *game)
           {
+               game.hostViewController=controller;
               [game setHostViewController:controller];
               [game startServerGameWithSession:session playerName:name clients:clients];
               // we need the controller to get the music files the user selected
