@@ -158,12 +158,7 @@
         
         NSUInteger index = sender;
         
-        [self.hostViewController startBroadcastSequence];
-        
-        [player setNowPlayingItem:[collection mediaItemAtIndex:index]];
-        [player play];
-        [playPauseButton setBackgroundImage:[UIImage imageNamed:@"pause.png"] forState:UIControlStateNormal];
-         
+        [self.hostViewController startBroadcastSequence];         
     }
     
     

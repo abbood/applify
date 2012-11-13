@@ -117,7 +117,7 @@
 	return FALSE;
 }
 
-- (void)startBroadcastSequence
+- (BOOL)startBroadcastSequence
 {
     NSLog(@"----------------------------\n");
     NSLog(@"<%@:%@:%d>", NSStringFromClass([self class]), NSStringFromSelector(_cmd), __LINE__);
@@ -130,9 +130,10 @@
         NSLog(@"SERVER: sending sign in request");
         Packet *packet = [Packet packetWithType:PacketTypeSignInRequest];
         [_game sendPacketToAllClients:packet];
+        return YES;
 	} else {
         [self showNoPeersConnectedAlert];
-      
+        return NO;
     }
 }
 
@@ -599,11 +600,7 @@
     NSString *title = [alertView buttonTitleAtIndex:buttonIndex];
     if ([title isEqualToString:@"OK"])
     {
-        HostViewController *hostViewController =
-        [[HostViewController alloc] initWithNibName:@"HostViewController"
-                                             bundle:nil];
-        
-        [self presentViewController:hostViewController animated:YES completion:nil];
+        [self.simplePlayerVC dismissModalViewControllerAnimated:YES];
     }
 }
 @end

@@ -56,7 +56,7 @@
 @property (nonatomic, strong)Game *game;
 @property (nonatomic,retain)MainViewController *mainview;
 @property (nonatomic, weak)Simple_PlayerViewController * simplePlayerVC;
-- (void)startBroadcastSequence;
+- (BOOL)startBroadcastSequence;
 - (IBAction)addMusic:(id)sender;
 - (IBAction)changeView_playList:(id)sender;
 
