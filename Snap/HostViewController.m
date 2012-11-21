@@ -1,6 +1,6 @@
 //
 //  HostViewController.m
-//  Snap
+//  Snapƒ
 //
 //  Created by Ray Wenderlich on 5/24/12.
 //  Copyright (c) 2012 Hollance. All rights reserved.
@@ -302,7 +302,13 @@
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
 	if (_matchmakingServer != nil)
+    {
+        for (NSInteger i = 0; i < [_matchmakingServer connectedClientCount]; ++i)
+        {
+        [self.cellarray addObject :@"nc"];
+        }
 		return [_matchmakingServer connectedClientCount];
+    }
 	else
 		return 0;
 }

@@ -99,7 +99,7 @@
     self.PhoneName.textColor   = [UIColor colorWithPatternImage:myGradient];
     JoinViewController *table=[[JoinViewController alloc]init ];
        
-    [table.cellarray replaceObjectAtIndex:self.row withObject:@"c"] ;
+  //  [table.cellarray replaceObjectAtIndex:self.row withObject:@"c"] ;
     
       
     

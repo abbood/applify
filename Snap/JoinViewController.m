@@ -513,7 +513,8 @@ int fserverCount=0;
         [self performSelector:@selector( MainGui) withObject:nil afterDelay:1];
     }
     if ([title isEqualToString:@"Host"])
-    {
+    {        
+        _matchmakingClient = nil;
         
         HostViewController *host=[[HostViewController alloc]initWithNibName:@"HostViewController" bundle:nil];
         host.delegate=self.mainview;

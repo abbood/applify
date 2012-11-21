@@ -141,12 +141,7 @@
     [self dismissViewControllerAnimated:YES completion:nil];
     
 }
--(IBAction)changeViewHost:(id)sender
-{
-    
-    [self dismissModalViewControllerAnimated:YES];
-   
-}
+
 
 -(void)playOrPauseAtindex:(NSUInteger)sender
 {NSLog(@"----------------------------\n");
