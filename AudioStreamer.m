@@ -1824,7 +1824,7 @@ cleanup:
                 
                 
                 
-           //     NSLog(@"READER: we are starting queue");
+                NSLog(@"READER: we are starting queue");
                 err = AudioQueueStart(audioQueue, NULL);
                 if (err)
                 {

@@ -282,7 +282,8 @@
         break;
             
         case PacketTypePlayMusicNow:
-        {                                 
+        {
+            NSLog(@"just received a play now packet!");
             pthread_mutex_lock(&streamer->queueBuffersMutex);                        
             
             streamer->state = AS_READY_TO_PLAY;
@@ -393,7 +394,7 @@ void CalculateBytesForTime(AudioStreamBasicDescription inDesc, Float64 inSeconds
 
 - (void)appendToRingBuffer:(Packet *)packet
 {               
-   // NSLog(@"we are in append to ring buffer");
+    NSLog(@"we are in append to ring buffer");
     // look at the @synchronized explanation in streamer::readFromRingBuffer
     // we basically sync with the streamer reading from the audio buffer
     //@synchronized(streamer) {
@@ -542,15 +543,6 @@ void CalculateBytesForTime(AudioStreamBasicDescription inDesc, Float64 inSeconds
         {
             [Logger Log:@"SERVER: JUST RECEIVED A PRIMED PACKET!"];
             player.isPrimed = true;  
-           [Logger Log:@"about to computePlayerPacketDelayMax"];
-            player.packetDelayMax = [self computePlayerPacketDelayMax:
-                                     [_localPlayerObj.packetProfiler.clientProfilers 
-                                                                       objectForKey:player.peerID]];
-            
-            
-            NSLog(@"%@ player has delay max of %f", player.name, player.packetDelayMax);
-            
-            
             if (_state == GameStateWaitingForPrimed && [self allPlayersArePrimed])
             {
                 //tell clients to start playing
@@ -563,7 +555,9 @@ void CalculateBytesForTime(AudioStreamBasicDescription inDesc, Float64 inSeconds
                 packet.sendReliably = false;
                 [self sendPacketToAllClients:packet];
                 
-                [hostViewController.musicPlayer play];
+                NSLog(@"about to fire music player");
+                
+                [self performSelector:@selector(startMusic:) withObject:hostViewController.musicPlayer afterDelay:0.45];
                 
                 _state =  GameStatePlayBackCommenced;
 
@@ -576,165 +570,10 @@ void CalculateBytesForTime(AudioStreamBasicDescription inDesc, Float64 inSeconds
 	}
 }
 
--(void)commencePlayBack
-{
-    __block double minDelayTime;
-    __block double clientDelayTime;
-    
-    [_players enumerateKeysAndObjectsUsingBlock:^(id key, Player *player, BOOL *stop) {
-        if (!player.isServer)
-            minDelayTime += player.packetDelayMax;        
-    }];
-    
-    NSLog(@"commencePlayBack: minDelayTime %f",minDelayTime);
-    clientDelayTime = minDelayTime;    
-    _serverDelayTime = clientDelayTime;
-    
-    [_players enumerateKeysAndObjectsUsingBlock:^(id key, Player *player, BOOL *stop) {
-        if (!player.isServer) {  
-             Packet *packet = [PacketPlayMusicNow packetWithDelayTime:clientDelayTime];
-            
-            NSLog(@"tell client %@ (%@) to play at time %f",player.name, player.peerID, clientDelayTime);
-            
-            [self sendPacketToClient:packet peerID:player.peerID];
-            if ((clientDelayTime - player.packetDelayMax) > 0) {
-                clientDelayTime -= player.packetDelayMax;            
-            }
-        }                        
-    }];
-    
-    
-    
-    NSLog(@"we will play music in server after %f time",_serverDelayTime);
-    
-    // play the music in a new thread
-    [NSThread
-     detachNewThreadSelector:@selector(startServerPlayBack:)
-     toTarget:self
-     withObject:hostViewController.musicPlayer]; 
-    
-    
-}
-
--(double)getRoundTripTime:(double)serverPacketSentTime
-{
-    return [Timer getTimeDifference:[Timer getCurTime] 
-                              time2:serverPacketSentTime];        
-}
-
-/**
- * returns the average latency difference of sending packets from the server to 
- * a particular client
- *
- * 
- */
--(double)computePlayerPacketDelayAvg:(NSMutableArray *)packetReceivedSchedule
-{
-    __block double differenceSum;
-    [_localPlayerObj.packetProfiler.packetSentSchedule enumerateObjectsUsingBlock:^(id serverTiming, NSUInteger idx, BOOL *stop) {
-        NSLog(@"at index %u comparing server time: %f AND client time %f",idx, [serverTiming doubleValue], [[packetReceivedSchedule objectAtIndex:idx] doubleValue]);
-      //  [Logger Log:@"going through the difference sum"];
-        double temp = [Timer getTimeDifference:[serverTiming doubleValue] 
-                                            time2:[[packetReceivedSchedule objectAtIndex:idx] doubleValue]
-                          ];
-        differenceSum += temp;
-        
-        NSLog(@"individual difference is %f ---> differnce sum is %f",temp, differenceSum);
-    }];
-    
-   // [Logger Log:@"just finished difference sum"];
-    
-    
-    differenceSum = differenceSum / [packetReceivedSchedule count];
-    return differenceSum /2;
-}
-
--(double)computePlayerPacketDelayMax:(NSMutableArray *)packetReceivedSchedule
-{
-    __block double differenceMax;
-    [_localPlayerObj.packetProfiler.packetSentSchedule enumerateObjectsUsingBlock:^(id serverTiming, NSUInteger idx, BOOL *stop) {
-        NSLog(@"at index %u comparing server time: %f AND client time %f",idx, [serverTiming doubleValue], [[packetReceivedSchedule objectAtIndex:idx] doubleValue]);
-        //  [Logger Log:@"going through the difference sum"];
-        double temp = [Timer getTimeDifference:[serverTiming doubleValue] 
-                                         time2:[[packetReceivedSchedule objectAtIndex:idx] doubleValue]
-                       ];
-        differenceMax = (temp >= differenceMax) ? temp : differenceMax;
-        
-        NSLog(@"individual difference is %f ---> differnce max is %f",temp, differenceMax);
-    }];
-    
-    // [Logger Log:@"just finished difference sum"];
-    
-    
-    differenceMax = differenceMax / 2;
-    NSLog(@"difference max / 2  is %f",differenceMax);
-    
-    return differenceMax;
-}
-
-
--(double)computeMinDelayTime
-{
-    __block double minDelayTime;
-    [_players enumerateKeysAndObjectsUsingBlock:^(id key, Player *player, BOOL *stop) {
-        if (!player.isServer)
-            minDelayTime += player.packetDelayAvg;        
-    }];
-    
-    NSLog(@"computeMinDelayTime: computeMinDelayTime %f",minDelayTime);
-    // this value must be absolute.. it cannot be relative to the host or the client
-    // we add a time padding just in case
-    return minDelayTime;
-}
-
-
--(void)startServerPlayBack:(MPMusicPlayerController *)player
-{    
-    NSLog(@"SERVER: just about to issue playing command");
-    [self performSelector:@selector(startMusic:) withObject:player afterDelay:_serverDelayTime];
-   /* CFDateRef dateNow;
-    CFDateRef startDate = CFDateCreate(NULL, _startTime);
-  //  NSLog(@"SERVER: this is server date start time");
-    [Timer printTime:_startTime];
-    
-    while(true) { 
-        dateNow = CFDateCreate(NULL, [Timer getCurTime]);
-        if (CFDateCompare(dateNow, startDate,NULL) >= 0)   // ie both times are equal 
-            // or we are past startDate
-        {
-            NSLog(@"now is the time! play!");
-            [player play];
-            break;
-        } else {
-      //      NSLog(@"SERVER: now isn't the time.. skip");
-        }
-    }    
-    */
-    
-   // NSLog(@"PLAYER THREAD: beginning player thread with starttime %lu divided by 1000 = %lu", _startTime, _startTime/1000);
-    
-    //[player performSelector:@selector(play) withObject:NULL afterDelay:0];
-    
-//    [player play];
-    
-    BOOL isRunning = YES;
-	do
-	{
-        NSLog(@"PLAYER THREAD: before play run loop");
-        
-		isRunning = [[NSRunLoop currentRunLoop]
-                     runMode:NSDefaultRunLoopMode
-                     beforeDate:[NSDate dateWithTimeIntervalSinceNow:0.25]];
-		
-        NSLog(@"PLAYER THREAD: after play run loop");
-    } while (isRunning);
-  
-    NSLog(@"PLAYER THREAD: finished player thread");
-}
 
 -(void)startMusic:(MPMusicPlayerController *)player
 {
-    NSLog(@"just about to start playing after having waited for %f", _serverDelayTime);
+    NSLog(@"SERVER: about to play");
     [player play];        
 }
 
