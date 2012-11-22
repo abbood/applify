@@ -55,6 +55,8 @@
     char * packet; 
     char * packetDescriptions;
     
+    NSLock *broadcastLock;
+    
 }
 
 @synthesize delegate = _delegate;
@@ -548,25 +550,24 @@ void CalculateBytesForTime(AudioStreamBasicDescription inDesc, Float64 inSeconds
             player.isPrimed = true;  
             if (_state == GameStateWaitingForPrimed && [self allPlayersArePrimed])
             {
-                //tell clients to start playing
-          //      [Logger Log:@"SERVER->ClIENT TELL clients to START PLAYING MUSIC!!"];
+                [broadcastLock lock];
                 
                 _broadCastState = BroadCastStatePaused;
                 [hostViewController.musicPlayer skipToBeginning];
                 
                 Packet *packet = [Packet packetWithType:PacketTypePlayMusicNow];
-                //packet.sendReliably = false;
-                
-                
-                //[self sendPacketToAllClients:packet];
+
                 NSError *error;
                 NSLog(@"all players are primed now!.. pausing broadcast ");
+                [hostViewController.musicPlayer play];
                 [_session sendDataToAllPeers:[packet data] withDataMode:GKSendDataUnreliable error:&error];
                 NSLog(@"will fire music player");
                 
-               // [hostViewController.musicPlayer play];
-                [self performSelector:@selector(startMusic:) withObject:hostViewController.musicPlayer afterDelay:0.01];
+                
+                [broadcastLock unlock];
+                _broadCastState = BroadCastStateInProgress;
                 _state =  GameStatePlayBackCommenced;
+
 
             }
         }
@@ -575,14 +576,6 @@ void CalculateBytesForTime(AudioStreamBasicDescription inDesc, Float64 inSeconds
 		default:
 			break;
 	}
-}
-
-
--(void)startMusic:(MPMusicPlayerController *)player
-{
-    NSLog(@"SERVER: about to play");
-    [player play];
-    _broadCastState = BroadCastStateInProgress;
 }
 
 
@@ -887,105 +880,105 @@ static void CheckError (OSStatus error, const char *operation)
     packet = (char*)malloc(MAX_PACKET_SIZE);
     packetDescriptions = (char*)malloc(MAX_PACKET_DESCRIPTIONS_SIZE);
     
-   // return readerOutput;
+    broadcastLock = [[NSLock alloc] init];
 }
 
+
 -(void)broadcastSample
-{    
-    CMSampleBufferRef sample;
-    sample = [readerOutput copyNextSampleBuffer];
+{
+    [broadcastLock lock];
     
-    CMItemCount numSamples = CMSampleBufferGetNumSamples(sample);
-    
-    if (!sample || (numSamples == 0)) {
-        Packet *packet = [Packet packetWithType:PacketTypeEndOfSong];
-        packet.sendReliably = NO;
-        [self sendPacketToAllClients:packet];
-        [sampleBroadcastTimer invalidate];
-        return;
-    }
-    
-                                      
-    NSLog(@"SERVER: going through sample loop");
-    Boolean isBufferDataReady = CMSampleBufferDataIsReady(sample);
-    
-
-    
-    CMBlockBufferRef CMBuffer = CMSampleBufferGetDataBuffer( sample );                                                         
-    AudioBufferList audioBufferList;  
-    
-    CheckError(CMSampleBufferGetAudioBufferListWithRetainedBlockBuffer(
-                                                                       sample,
-                                                                       NULL,
-                                                                       &audioBufferList,
-                                                                       sizeof(audioBufferList),
-                                                                       NULL,
-                                                                       NULL,
-                                                                       kCMSampleBufferFlag_AudioBufferList_Assure16ByteAlignment,
-                                                                       &CMBuffer
-                                                                       ),
-               "could not read sample data");
-    
-    const AudioStreamPacketDescription   * inPacketDescriptions;
-    
-    size_t								 packetDescriptionsSizeOut;
-    size_t inNumberPackets;
-    
-    CheckError(CMSampleBufferGetAudioStreamPacketDescriptionsPtr(sample, 
-                                                                 &inPacketDescriptions,
-                                                                 &packetDescriptionsSizeOut),
-               "could not read sample packet descriptions");
-    
-    inNumberPackets = packetDescriptionsSizeOut/sizeof(AudioStreamPacketDescription);
-    
-    AudioBuffer audioBuffer = audioBufferList.mBuffers[0];
-    
-    
-    
-    for (int i = 0; i < inNumberPackets; ++i)
-    {
-        if (_broadCastState == BroadCastStatePaused) {
-            NSLog(@"putting broadcast thread to sleep for %d seconds", broadcastDelay);
-            [NSThread sleepForTimeInterval:broadcastDelay];
+        CMSampleBufferRef sample;
+        sample = [readerOutput copyNextSampleBuffer];
+        
+        CMItemCount numSamples = CMSampleBufferGetNumSamples(sample);
+        
+        if (!sample || (numSamples == 0)) {
+            Packet *packet = [Packet packetWithType:PacketTypeEndOfSong];
+            packet.sendReliably = NO;
+            [self sendPacketToAllClients:packet];
+            [sampleBroadcastTimer invalidate];
+            return;
         }
         
-        NSLog(@"going through packets loop");
-        SInt64 dataOffset = inPacketDescriptions[i].mStartOffset;
-        UInt32 dataSize   = inPacketDescriptions[i].mDataByteSize;            
+                                          
+        NSLog(@"SERVER: going through sample loop");
+        Boolean isBufferDataReady = CMSampleBufferDataIsReady(sample);
         
-        size_t packetSpaceRemaining = MAX_PACKET_SIZE - packetBytesFilled - packetDescriptionsBytesFilled;
-        size_t packetDescrSpaceRemaining = MAX_PACKET_DESCRIPTIONS_SIZE - packetDescriptionsBytesFilled;        
 
-        if ((packetSpaceRemaining < (dataSize + AUDIO_STREAM_PACK_DESC_SIZE)) || 
-            (packetDescrSpaceRemaining < AUDIO_STREAM_PACK_DESC_SIZE))
+        
+        CMBlockBufferRef CMBuffer = CMSampleBufferGetDataBuffer( sample );                                                         
+        AudioBufferList audioBufferList;  
+        
+        CheckError(CMSampleBufferGetAudioBufferListWithRetainedBlockBuffer(
+                                                                           sample,
+                                                                           NULL,
+                                                                           &audioBufferList,
+                                                                           sizeof(audioBufferList),
+                                                                           NULL,
+                                                                           NULL,
+                                                                           kCMSampleBufferFlag_AudioBufferList_Assure16ByteAlignment,
+                                                                           &CMBuffer
+                                                                           ),
+                   "could not read sample data");
+        
+        const AudioStreamPacketDescription   * inPacketDescriptions;
+        
+        size_t								 packetDescriptionsSizeOut;
+        size_t inNumberPackets;
+        
+        CheckError(CMSampleBufferGetAudioStreamPacketDescriptionsPtr(sample, 
+                                                                     &inPacketDescriptions,
+                                                                     &packetDescriptionsSizeOut),
+                   "could not read sample packet descriptions");
+        
+        inNumberPackets = packetDescriptionsSizeOut/sizeof(AudioStreamPacketDescription);
+        
+        AudioBuffer audioBuffer = audioBufferList.mBuffers[0];
+        
+        
+        
+        for (int i = 0; i < inNumberPackets; ++i)
         {
-            if (![self encapsulateAndShipPacket:packet packetDescriptions:packetDescriptions packetID:assetOnAirID])
-                break;
-        }
-        
-        memcpy((char*)packet + packetBytesFilled, 
-               (const char*)(audioBuffer.mData + dataOffset), dataSize); 
-        
-        memcpy((char*)packetDescriptions + packetDescriptionsBytesFilled, 
-               [self encapsulatePacketDescription:inPacketDescriptions[i]
-                                     mStartOffset:packetBytesFilled
-                ],
-               AUDIO_STREAM_PACK_DESC_SIZE);  
-        
-        
-        packetBytesFilled += dataSize;
-        packetDescriptionsBytesFilled += AUDIO_STREAM_PACK_DESC_SIZE; 
-        
-        // if this is the last packet, then ship it
-        if (i == (inNumberPackets - 1)) {          
-            NSLog(@"woooah! this is the last packet (%d).. so we will ship it!", i);
-            if (![self encapsulateAndShipPacket:packet packetDescriptions:packetDescriptions packetID:assetOnAirID])
-                break;
-            
-        }                  
-    }      
-    
 
+            NSLog(@"going through packets loop");
+            SInt64 dataOffset = inPacketDescriptions[i].mStartOffset;
+            UInt32 dataSize   = inPacketDescriptions[i].mDataByteSize;            
+            
+            size_t packetSpaceRemaining = MAX_PACKET_SIZE - packetBytesFilled - packetDescriptionsBytesFilled;
+            size_t packetDescrSpaceRemaining = MAX_PACKET_DESCRIPTIONS_SIZE - packetDescriptionsBytesFilled;        
+
+            if ((packetSpaceRemaining < (dataSize + AUDIO_STREAM_PACK_DESC_SIZE)) || 
+                (packetDescrSpaceRemaining < AUDIO_STREAM_PACK_DESC_SIZE))
+            {
+                if (![self encapsulateAndShipPacket:packet packetDescriptions:packetDescriptions packetID:assetOnAirID])
+                    break;
+            }
+            
+            memcpy((char*)packet + packetBytesFilled, 
+                   (const char*)(audioBuffer.mData + dataOffset), dataSize); 
+            
+            memcpy((char*)packetDescriptions + packetDescriptionsBytesFilled, 
+                   [self encapsulatePacketDescription:inPacketDescriptions[i]
+                                         mStartOffset:packetBytesFilled
+                    ],
+                   AUDIO_STREAM_PACK_DESC_SIZE);  
+            
+            
+            packetBytesFilled += dataSize;
+            packetDescriptionsBytesFilled += AUDIO_STREAM_PACK_DESC_SIZE; 
+            
+            // if this is the last packet, then ship it
+            if (i == (inNumberPackets - 1)) {          
+                NSLog(@"woooah! this is the last packet (%d).. so we will ship it!", i);
+                if (![self encapsulateAndShipPacket:packet packetDescriptions:packetDescriptions packetID:assetOnAirID])
+                    break;
+                
+            }
+
+        }
+    
+    [broadcastLock unlock];
 }
 
 
@@ -1056,10 +1049,7 @@ static void CheckError (OSStatus error, const char *operation)
         numProfilePackets++;        
     }
     
-    if (_broadCastState == BroadCastStatePaused) {
-        NSLog(@"putting broadcast thread to sleep for %f seconds", broadcastDelay);
-        [NSThread sleepForTimeInterval:broadcastDelay];
-    }
+
     
     
     NSLog(@"sending packet number %lu to all peers", packetNumber);
