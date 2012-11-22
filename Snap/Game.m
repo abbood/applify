@@ -52,6 +52,9 @@
     NSString * assetOnAirID;
     AVAssetReaderTrackOutput *readerOutput;
     
+    char * packet; 
+    char * packetDescriptions;
+    
 }
 
 @synthesize delegate = _delegate;
@@ -547,18 +550,22 @@ void CalculateBytesForTime(AudioStreamBasicDescription inDesc, Float64 inSeconds
             {
                 //tell clients to start playing
           //      [Logger Log:@"SERVER->ClIENT TELL clients to START PLAYING MUSIC!!"];
-                NSLog(@"all players are primed now!");
                 
+                _broadCastState = BroadCastStatePaused;
                 [hostViewController.musicPlayer skipToBeginning];
                 
                 Packet *packet = [Packet packetWithType:PacketTypePlayMusicNow];
-                packet.sendReliably = false;
-                [self sendPacketToAllClients:packet];
+                //packet.sendReliably = false;
                 
-                NSLog(@"about to fire music player");
                 
-                [self performSelector:@selector(startMusic:) withObject:hostViewController.musicPlayer afterDelay:0.45];
+                //[self sendPacketToAllClients:packet];
+                NSError *error;
+                NSLog(@"all players are primed now!.. pausing broadcast ");
+                [_session sendDataToAllPeers:[packet data] withDataMode:GKSendDataUnreliable error:&error];
+                NSLog(@"will fire music player");
                 
+               // [hostViewController.musicPlayer play];
+                [self performSelector:@selector(startMusic:) withObject:hostViewController.musicPlayer afterDelay:0.01];
                 _state =  GameStatePlayBackCommenced;
 
             }
@@ -574,7 +581,8 @@ void CalculateBytesForTime(AudioStreamBasicDescription inDesc, Float64 inSeconds
 -(void)startMusic:(MPMusicPlayerController *)player
 {
     NSLog(@"SERVER: about to play");
-    [player play];        
+    [player play];
+    _broadCastState = BroadCastStateInProgress;
 }
 
 
@@ -804,6 +812,8 @@ static void CheckError (OSStatus error, const char *operation)
         [self setUpReader];
         
         
+        
+        
         NSDate *fireDate = [NSDate dateWithTimeIntervalSinceNow:0];
         sampleBroadcastTimer = [[NSTimer alloc] initWithFireDate:fireDate
                                                   interval:[self getBroadCastInterval]
@@ -825,7 +835,7 @@ static void CheckError (OSStatus error, const char *operation)
                          beforeDate:[NSDate distantFuture]];
             
             NSLog(@"SERVER: after broadcast run loop");            
-        } while (isRunning && [self shouldContinueBroadcasting]);
+        } while (isRunning);
     }   
     
     
@@ -835,11 +845,11 @@ static void CheckError (OSStatus error, const char *operation)
 -(BOOL)shouldContinueBroadcasting
 {
     if (_broadCastState == BroadCastStateInProgress) {
-        NSLog(@"shouldContinueBroadcasting? YES");
+//        NSLog(@"shouldContinueBroadcasting? YES");
         return YES;
     }
     
-            NSLog(@"shouldContinueBroadcasting? NO");
+  //          NSLog(@"shouldContinueBroadcasting? NO");
     return NO;
 }
 
@@ -871,7 +881,11 @@ static void CheckError (OSStatus error, const char *operation)
     
     packetNumber = 0;
         
-    _localPlayerObj = [self playerWithPeerID:_session.peerID];      
+    _localPlayerObj = [self playerWithPeerID:_session.peerID];
+    
+    // allocate memory to move around audio data
+    packet = (char*)malloc(MAX_PACKET_SIZE);
+    packetDescriptions = (char*)malloc(MAX_PACKET_DESCRIPTIONS_SIZE);
     
    // return readerOutput;
 }
@@ -926,12 +940,16 @@ static void CheckError (OSStatus error, const char *operation)
     
     AudioBuffer audioBuffer = audioBufferList.mBuffers[0];
     
-    char * packet = (char*)malloc(MAX_PACKET_SIZE);
-    char * packetDescriptions = (char*)malloc(MAX_PACKET_DESCRIPTIONS_SIZE);
     
     
     for (int i = 0; i < inNumberPackets; ++i)
     {
+        if (_broadCastState == BroadCastStatePaused) {
+            NSLog(@"putting broadcast thread to sleep for %d seconds", broadcastDelay);
+            [NSThread sleepForTimeInterval:broadcastDelay];
+        }
+        
+        NSLog(@"going through packets loop");
         SInt64 dataOffset = inPacketDescriptions[i].mStartOffset;
         UInt32 dataSize   = inPacketDescriptions[i].mDataByteSize;            
         
@@ -960,7 +978,7 @@ static void CheckError (OSStatus error, const char *operation)
         
         // if this is the last packet, then ship it
         if (i == (inNumberPackets - 1)) {          
-            //NSLog(@"woooah! this is the last packet (%d).. so we will ship it!", i);
+            NSLog(@"woooah! this is the last packet (%d).. so we will ship it!", i);
             if (![self encapsulateAndShipPacket:packet packetDescriptions:packetDescriptions packetID:assetOnAirID])
                 break;
             
@@ -996,11 +1014,11 @@ static void CheckError (OSStatus error, const char *operation)
               packetDescriptions:(void *)packetDescriptions
                         packetID:(NSString *)packetID
 {
-    if (![self shouldContinueBroadcasting])
+  /*  if (![self shouldContinueBroadcasting])
     {
         [sampleBroadcastTimer invalidate];
         return NO;
-    }
+    }*/
     // package Packet
     char * headerPacket = (char *)malloc(MAX_PACKET_SIZE + AUDIO_BUFFER_PACKET_HEADER_SIZE + packetDescriptionsBytesFilled);
     
@@ -1022,7 +1040,7 @@ static void CheckError (OSStatus error, const char *operation)
     
     memcpy((char *)(headerPacket + offset), (char *)packetDescriptions, packetDescriptionsBytesFilled);
     
-    NSData *completePacket = [NSData dataWithBytes:headerPacket length: AUDIO_BUFFER_PACKET_HEADER_SIZE + packetBytesFilled + packetDescriptionsBytesFilled];        
+    NSData *completePacket = [NSData dataWithBytes:headerPacket length: AUDIO_BUFFER_PACKET_HEADER_SIZE + packetBytesFilled + packetDescriptionsBytesFilled];
     
     
        //ship packet
@@ -1037,6 +1055,12 @@ static void CheckError (OSStatus error, const char *operation)
                                                                 atIndex:packetNumber];
         numProfilePackets++;        
     }
+    
+    if (_broadCastState == BroadCastStatePaused) {
+        NSLog(@"putting broadcast thread to sleep for %f seconds", broadcastDelay);
+        [NSThread sleepForTimeInterval:broadcastDelay];
+    }
+    
     
     NSLog(@"sending packet number %lu to all peers", packetNumber);
     NSError *error;    

@@ -26,6 +26,7 @@
 
 #define kBufferLength 1024
 #define timePadding 5
+#define broadcastDelay 1
 
 #define Log_PATH "/Users/abdullahbakhach/Music/iTunes/iTunes Media/Music/Unknown Artist/Unknown Album/mozart.mp3"
 
